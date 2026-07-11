@@ -1,5 +1,14 @@
 # ZeroDroid
 
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
+  <img src="https://img.shields.io/badge/Kotlin-2.0.21-7F52FF.svg?logo=kotlin&logoColor=white" alt="Kotlin 2.0.21" />
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84.svg?logo=android&logoColor=white" alt="Platform: Android" />
+  <img src="https://img.shields.io/badge/Min%20SDK-26%20(Android%208.0)-orange.svg" alt="Min SDK 26" />
+  <img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4.svg?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" />
+  <img src="https://img.shields.io/badge/Tools-27-blueviolet.svg" alt="27 Tools" />
+</p>
+
 **The all-in-one Android hardware toolkit.**
 
 ZeroDroid turns your phone into a portable RF lab, network analyzer, and security auditor. It exposes every radio, sensor, and port your device has — WiFi, Bluetooth, BLE, NFC, IR, UWB, USB, GPS, cellular, magnetometer, barometer, microphone — through 27 specialized tools with a terminal-hacker aesthetic.
@@ -28,6 +37,9 @@ Built for penetration testers, security researchers, RF engineers, and anyone wh
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Ethical Use](#ethical-use)
+- [Contributing](#contributing)
+- [Support](#support)
+- [Disclaimer](#disclaimer)
 - [License](#license)
 
 ---
@@ -142,7 +154,7 @@ Font: JetBrains Mono throughout
 ### Build
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/theabhishekchandra/ZeroDroid.git
 cd ZeroDroid
 ./gradlew assembleDebug
 ```
@@ -904,6 +916,45 @@ ZeroDroid shows an **Ethical Use Agreement** on first launch that cannot be dism
 - Report vulnerabilities responsibly through proper channels
 
 Declining the agreement exits the app.
+
+---
+
+## Contributing
+
+Contributions are welcome — bug reports, new tool ideas, hardware compatibility notes, and pull requests.
+
+1. **Fork** the repository and create a feature branch: `git checkout -b feature/my-tool`
+2. Follow the existing feature structure (`domain/` → `data/` → `ui/` → `viewmodel/`) — keep Android UI imports out of `domain/`.
+3. Match the code style: Kotlin, MVVM, StateFlow, Jetpack Compose, JetBrains Mono terminal aesthetic.
+4. Test on a **physical device** — most features depend on real hardware.
+5. Commit with a clear message and open a **pull request** describing what changed and how you verified it.
+
+When adding a new tool, register its screen in `navigation/ZeroDroidScreen.kt`, wire any new service into `core/di/AppContainer.kt` (lazy-initialized), and document it in this README's tool guide.
+
+---
+
+## Support
+
+- **Bug reports & feature requests:** [open an issue](https://github.com/theabhishekchandra/ZeroDroid/issues)
+- **Questions & ideas:** start a [discussion](https://github.com/theabhishekchandra/ZeroDroid/discussions)
+- **Security disclosures:** please report privately rather than in a public issue
+
+If ZeroDroid is useful to you, consider **starring the repo** ⭐ — it helps others discover the project.
+
+---
+
+## Disclaimer
+
+ZeroDroid is provided **for educational purposes, authorized security research, and defensive use only**.
+
+The tools in this app inspect radios, sensors, and networks that surround you. Using them to access, monitor, disrupt, or attack networks, devices, or people **without explicit authorization is illegal** in most jurisdictions and is **not** the intended use of this software.
+
+- You are solely responsible for how you use ZeroDroid and for complying with all applicable local, national, and international laws.
+- Only scan, probe, or test networks and devices that you **own** or have **written permission** to assess.
+- Detection features (IMSI catchers, hidden cameras, trackers, rogue APs, etc.) are heuristics and **may produce false positives or miss real threats** — do not rely on them as your sole security measure.
+- The author(s) and contributors accept **no liability** for misuse or for any damages arising from the use of this software. It is provided "as is", without warranty of any kind.
+
+By building, installing, or using ZeroDroid, you agree to these terms and to the in-app Ethical Use Agreement.
 
 ---
 
