@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#04070a; }
+  #banner {
+    position:absolute; top:0; left:0;
+    width:1200px; height:400px;
+    background:
+      radial-gradient(circle at 26% 50%, rgba(0,230,118,0.18), transparent 42%),
+      radial-gradient(circle at 80% 30%, rgba(0,200,255,0.06), transparent 45%),
+      linear-gradient(180deg, #060b0d 0%, #04080a 100%);
+    font-family: Menlo, "SF Mono", "Courier New", monospace;
+    overflow:hidden;
+  }
+  /* grid overlay */
+  #banner::before {
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(0,230,118,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,230,118,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 55%, transparent 92%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 55%, transparent 92%);
+  }
+  /* corner HUD brackets */
+  .corner { position:absolute; width:34px; height:34px; border:2px solid rgba(0,230,118,0.55); }
+  .tl{ top:22px; left:22px; border-right:none; border-bottom:none;}
+  .tr{ top:22px; right:22px; border-left:none; border-bottom:none;}
+  .bl{ bottom:22px; left:22px; border-right:none; border-top:none;}
+  .br{ bottom:22px; right:22px; border-left:none; border-top:none;}
+
+  .row { position:absolute; top:50%; left:80px; right:60px; transform:translateY(-50%);
+         display:flex; align-items:center; gap:54px; }
+
+  .shield { filter: drop-shadow(0 0 18px rgba(0,230,118,0.55)); flex:0 0 auto; }
+
+  .text { display:flex; flex-direction:column; gap:14px; }
+  .title {
+    font-size:82px; font-weight:800; letter-spacing:6px; line-height:1;
+    color:#00e676;
+    text-shadow:0 0 22px rgba(0,230,118,0.65), 0 0 6px rgba(0,230,118,0.9);
+  }
+  .title .dim { color:#0a2f1c; text-shadow:none; }
+  .sub { font-size:20px; letter-spacing:5px; color:#5fd39a; font-weight:600; }
+  .sub .slash { color:#00c853; }
+  .chips { display:flex; gap:12px; margin-top:6px; flex-wrap:wrap; }
+  .chip {
+    font-size:16px; font-weight:700; letter-spacing:1px;
+    color:#00e676; padding:6px 14px;
+    border:1px solid rgba(0,230,118,0.45); border-radius:4px;
+    background:rgba(0,230,118,0.06);
+  }
+  .cursor {
+    display:inline-block; width:16px; height:30px; margin-left:6px;
+    background:#00e676; box-shadow:0 0 14px rgba(0,230,118,0.8);
+    vertical-align:-4px;
+  }
+  .tag {
+    position:absolute; top:30px; right:70px;
+    font-size:15px; letter-spacing:3px; color:#00c853;
+    border:1px solid rgba(0,200,83,0.5); padding:5px 12px; border-radius:4px;
+    background:rgba(0,200,83,0.07);
+  }
+  .scan { position:absolute; left:0; right:0; top:0; height:2px;
+    background:linear-gradient(90deg, transparent, rgba(0,230,118,0.7), transparent); top:120px; }
+</style>
+</head>
+<body>
+  <div id="banner">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+    <div class="scan"></div>
+    <div class="tag">27 TOOLS · v1.0</div>
+
+    <div class="row">
+      <!-- Shield logo -->
+      <svg class="shield" width="150" height="180" viewBox="0 0 150 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M75 6 L140 34 V92 C140 132 112 162 75 174 C38 162 10 132 10 92 V34 Z"
+              fill="#08120c" stroke="#00e676" stroke-width="4"/>
+        <path d="M75 16 L131 40 V90 C131 124 108 150 75 161 C42 150 19 124 19 90 V40 Z"
+              fill="none" stroke="rgba(0,230,118,0.25)" stroke-width="2"/>
+        <text x="50%" y="58%" text-anchor="middle" dominant-baseline="middle"
+              font-family="Menlo, monospace" font-size="96" font-weight="800" fill="#00e676">Z</text>
+        <rect x="94" y="104" width="14" height="14" fill="#00e676"/>
+      </svg>
+
+      <div class="text">
+        <div class="title">ZERODROID<span class="cursor"></span></div>
+        <div class="sub"><span class="slash">//</span> HARDWARE&nbsp;·&nbsp;SECURITY&nbsp;·&nbsp;TOOLKIT</div>
+        <div class="chips">
+          <span class="chip">WiFi</span>
+          <span class="chip">BLE</span>
+          <span class="chip">NFC</span>
+          <span class="chip">RF</span>
+          <span class="chip">GPS</span>
+          <span class="chip">SDR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
