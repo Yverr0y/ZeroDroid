@@ -10,12 +10,20 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
-  <img src="https://img.shields.io/badge/Kotlin-2.0.21-7F52FF.svg?logo=kotlin&logoColor=white" alt="Kotlin 2.0.21" />
-  <img src="https://img.shields.io/badge/Platform-Android-3DDC84.svg?logo=android&logoColor=white" alt="Platform: Android" />
-  <img src="https://img.shields.io/badge/Min%20SDK-26%20(Android%208.0)-orange.svg" alt="Min SDK 26" />
-  <img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4.svg?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" />
-  <img src="https://img.shields.io/badge/Tools-27-blueviolet.svg" alt="27 Tools" />
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0.21-0D1117?style=for-the-badge&logo=kotlin&logoColor=00E676&labelColor=0D1117" />
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-0D1117?style=for-the-badge&logo=jetpackcompose&logoColor=00E676&labelColor=0D1117" />
+  <img alt="Android 8.0+" src="https://img.shields.io/badge/Android%208.0%2B-0D1117?style=for-the-badge&logo=android&logoColor=00E676&labelColor=0D1117" />
+  <img alt="Material 3" src="https://img.shields.io/badge/Material%203-0D1117?style=for-the-badge&logo=materialdesign&logoColor=00E676&labelColor=0D1117" />
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-00C853?style=for-the-badge&labelColor=0D1117" /></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/theabhishekchandra/ZeroDroid/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117&logo=github" /></a>
+  <a href="https://github.com/theabhishekchandra/ZeroDroid/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117&logo=github" /></a>
+  <a href="https://github.com/theabhishekchandra/ZeroDroid/issues"><img alt="Issues" src="https://img.shields.io/github/issues/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117" /></a>
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117" />
+  <img alt="Code size" src="https://img.shields.io/github/languages/code-size/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117" />
+  <img alt="Tools" src="https://img.shields.io/badge/tools-27-00C853?style=flat-square&labelColor=0D1117" />
 </p>
 
 <p align="center">
@@ -43,6 +51,23 @@ ZeroDroid exposes every radio, sensor, and port your phone has — WiFi, Bluetoo
 | 🆓 **Open source** | MIT licensed · Kotlin · Jetpack Compose · Material 3 |
 
 > Built for penetration testers, security researchers, RF engineers — and anyone curious about the invisible wireless world around them.
+
+---
+
+## 📸 Screenshots
+
+<table align="center">
+  <tr>
+    <td align="center" width="33%"><img src="docs/screenshots/dashboard.png" alt="Dashboard" /></td>
+    <td align="center" width="33%"><img src="docs/screenshots/toolkit.png" alt="Toolkit" /></td>
+    <td align="center" width="33%"><img src="docs/screenshots/drawer.png" alt="Navigation drawer" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>📊 Dashboard</b><br/>Device &amp; hardware grid</sub></td>
+    <td align="center"><sub><b>🧰 Toolkit</b><br/>27 tools by category</sub></td>
+    <td align="center"><sub><b>🧭 Navigation</b><br/>Terminal-styled drawer</sub></td>
+  </tr>
+</table>
 
 ---
 
@@ -128,22 +153,6 @@ Every tool solves a specific, real problem. Full step-by-step docs live in the *
 | **Deauth Detector** | Detects deauth floods, jamming, AP disappearance, channel hopping |
 | **Signal Logger** *(bonus)* | Continuous WiFi+BLE timeline with arrival/departure tracking |
 </details>
-
----
-
-## 📸 Screenshots
-
-<p align="center">
-  <img src="docs/screenshots/dashboard.png" width="30%" alt="Dashboard — device info and hardware grid" />
-  &nbsp;
-  <img src="docs/screenshots/toolkit.png" width="30%" alt="Toolkit — feature tiles by category" />
-  &nbsp;
-  <img src="docs/screenshots/drawer.png" width="30%" alt="Navigation drawer" />
-</p>
-
-<p align="center">
-  <sub><b>Dashboard</b> &nbsp;·&nbsp; <b>Toolkit</b> &nbsp;·&nbsp; <b>Navigation</b></sub>
-</p>
 
 ---
 
@@ -342,6 +351,22 @@ Not all phones have all hardware. The Dashboard shows which capabilities your de
 
 ## 🛠️ Tech Stack
 
+<p align="center">
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" />
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" />
+  <img alt="Material 3" src="https://img.shields.io/badge/Material%203-757575?style=for-the-badge&logo=materialdesign&logoColor=white" />
+  <img alt="Room" src="https://img.shields.io/badge/Room%20DB-003B57?style=for-the-badge&logo=sqlite&logoColor=white" />
+  <img alt="CameraX" src="https://img.shields.io/badge/CameraX-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
+  <img alt="ML Kit" src="https://img.shields.io/badge/ML%20Kit-4285F4?style=for-the-badge&logo=google&logoColor=white" />
+  <img alt="Gradle" src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white" />
+  <img alt="Android Studio" src="https://img.shields.io/badge/Android%20Studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white" />
+</p>
+
+<p align="center"><sub><b>Architecture:</b> MVVM (ViewModel + StateFlow + Compose) · Manual DI (lazy) · Room (auto-migration) · Dark Material 3 theme with JetBrains Mono</sub></p>
+
+<details>
+<summary><b>Full dependency versions</b></summary>
+
 | Layer | Technology |
 |-------|-----------|
 | Language | Kotlin 2.0.21 |
@@ -357,6 +382,7 @@ Not all phones have all hardware. The Dashboard shows which capabilities your de
 | Permissions | Accompanist Permissions |
 | Build | Gradle 9.2.1, AGP 9.0.1 |
 | Min / Target SDK | 26 (Android 8.0) / 36 |
+</details>
 
 ---
 
