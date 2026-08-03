@@ -482,3 +482,4 @@ Licensed under the [MIT License](LICENSE).
 <p align="center">
   <sub>Built with ☕ and Kotlin · If you find ZeroDroid useful, drop a ⭐</sub>
 </p>
+ 
