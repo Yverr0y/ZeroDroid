@@ -22,14 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.features.wardriving.viewmodel.WardrivingViewModel
 
 @Composable
 fun WardrivingScreen(
-    viewModel: WardrivingViewModel = viewModel(factory = WardrivingViewModel.Factory)
+    viewModel: WardrivingViewModel = hiltViewModel()
 ) {
     PermissionGate(
         permissions = PermissionUtils.wardrivingPermissions(),

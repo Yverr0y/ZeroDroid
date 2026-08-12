@@ -10,10 +10,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.abhishek.zerodroid.core.di.NfcTagBus
 import com.abhishek.zerodroid.navigation.AppNavigation
 import com.abhishek.zerodroid.ui.theme.ZeroDroidTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var nfcTagBus: NfcTagBus
 
     private var nfcAdapter: NfcAdapter? = null
     private var nfcPendingIntent: PendingIntent? = null
@@ -67,7 +74,7 @@ class MainActivity : ComponentActivity() {
                 intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
             }
             tag?.let {
-                (application as ZeroDroidApp).container.emitNfcTag(it)
+                nfcTagBus.emit(it)
             }
         }
     }

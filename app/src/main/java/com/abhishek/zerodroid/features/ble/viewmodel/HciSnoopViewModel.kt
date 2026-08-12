@@ -3,13 +3,11 @@ package com.abhishek.zerodroid.features.ble.viewmodel
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.HciPacketType
 import com.abhishek.zerodroid.features.ble.domain.HciSnoopLog
 import com.abhishek.zerodroid.features.ble.domain.HciSnoopParser
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +17,7 @@ import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
+import javax.inject.Inject
 
 data class HciSnoopState(
     val isLoading: Boolean = false,
@@ -28,7 +27,8 @@ data class HciSnoopState(
     val loadedFromPath: String? = null
 )
 
-class HciSnoopViewModel(
+@HiltViewModel
+class HciSnoopViewModel @Inject constructor(
     private val application: Application
 ) : ViewModel() {
 
@@ -44,17 +44,6 @@ class HciSnoopViewModel(
             "/data/log/bt/btsnoop_hci.log",
             "/storage/emulated/0/btsnoop_hci.log"
         )
-
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return HciSnoopViewModel(app) as T
-            }
-        }
     }
 
     fun loadLog() {

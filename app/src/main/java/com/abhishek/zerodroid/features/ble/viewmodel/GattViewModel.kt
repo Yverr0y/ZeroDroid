@@ -2,10 +2,7 @@ package com.abhishek.zerodroid.features.ble.viewmodel
 
 import android.bluetooth.BluetoothGattCharacteristic
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.CharacteristicDetailState
 import com.abhishek.zerodroid.features.ble.domain.CharacteristicValue
 import com.abhishek.zerodroid.features.ble.domain.GattCharacteristicInfo
@@ -14,12 +11,15 @@ import com.abhishek.zerodroid.features.ble.domain.GattExplorer
 import com.abhishek.zerodroid.features.ble.domain.GattOperationResult
 import com.abhishek.zerodroid.features.ble.domain.GattValueParsers
 import com.abhishek.zerodroid.features.ble.domain.WriteMode
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GattViewModel(
+@HiltViewModel
+class GattViewModel @Inject constructor(
     private val explorer: GattExplorer
 ) : ViewModel() {
 
@@ -204,20 +204,6 @@ class GattViewModel(
             cleaned.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
         } catch (_: Exception) {
             null
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val explorer = GattExplorer(
-                    context = app.applicationContext,
-                    bluetoothManager = app.container.bluetoothManager
-                )
-                return GattViewModel(explorer) as T
-            }
         }
     }
 }

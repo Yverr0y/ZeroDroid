@@ -1,10 +1,7 @@
 package com.abhishek.zerodroid.features.sensors.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.sensors.domain.FloorState
 import com.abhishek.zerodroid.features.sensors.domain.FloorTracker
 import com.abhishek.zerodroid.features.sensors.domain.MetalDetector
@@ -14,6 +11,7 @@ import com.abhishek.zerodroid.features.sensors.domain.SensorReading
 import com.abhishek.zerodroid.features.sensors.domain.TiltState
 import com.abhishek.zerodroid.features.sensors.domain.VibrationSeverity
 import com.abhishek.zerodroid.features.sensors.domain.VibrationState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,21 +23,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.math.atan2
 import kotlin.math.sqrt
+import javax.inject.Inject
 
-class SensorViewModel(
+@HiltViewModel
+class SensorViewModel @Inject constructor(
     private val sensorDataCollector: SensorDataCollector
 ) : ViewModel() {
 
     companion object {
         private const val AUTO_STOP_TIMEOUT_MS = 60_000L
-
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return SensorViewModel(app.container.sensorDataCollector) as T
-            }
-        }
     }
 
     private val metalDetector = MetalDetector()

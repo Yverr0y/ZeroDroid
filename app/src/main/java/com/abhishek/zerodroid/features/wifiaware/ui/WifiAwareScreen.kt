@@ -15,14 +15,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.StatusIndicator
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.wifiaware.viewmodel.WifiAwareViewModel
 
 @Composable
 fun WifiAwareScreen(
-    viewModel: WifiAwareViewModel = viewModel(factory = WifiAwareViewModel.Factory)
+    viewModel: WifiAwareViewModel = hiltViewModel()
 ) {
     DisposableEffect(Unit) {
         onDispose { viewModel.detachSession() }

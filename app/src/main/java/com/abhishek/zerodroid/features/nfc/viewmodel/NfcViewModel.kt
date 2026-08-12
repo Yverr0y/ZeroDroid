@@ -1,32 +1,31 @@
 package com.abhishek.zerodroid.features.nfc.viewmodel
 
+import android.nfc.NfcAdapter
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
+import com.abhishek.zerodroid.core.di.NfcTagBus
 import com.abhishek.zerodroid.features.nfc.data.NfcRepository
 import com.abhishek.zerodroid.features.nfc.domain.NfcState
 import com.abhishek.zerodroid.features.nfc.domain.NfcTagManager
 import com.abhishek.zerodroid.features.nfc.domain.WriteResult
-import kotlinx.coroutines.flow.MutableSharedFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NfcViewModel(
+@HiltViewModel
+class NfcViewModel @Inject constructor(
     private val nfcTagManager: NfcTagManager,
     private val repository: NfcRepository,
-    private val nfcTagFlow: SharedFlow<Tag>,
-    isNfcAvailable: Boolean,
-    isNfcEnabled: Boolean
+    private val nfcTagBus: NfcTagBus,
+    private val nfcAdapter: NfcAdapter?
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        NfcState(isNfcAvailable = isNfcAvailable, isNfcEnabled = isNfcEnabled)
+        NfcState(isNfcAvailable = nfcAdapter != null, isNfcEnabled = nfcAdapter?.isEnabled == true)
     )
     val state: StateFlow<NfcState> = _state.asStateFlow()
 
@@ -39,7 +38,7 @@ class NfcViewModel(
             }
         }
         viewModelScope.launch {
-            nfcTagFlow.collect { tag ->
+            nfcTagBus.tagFlow.collect { tag ->
                 lastTag = tag
                 val tagInfo = nfcTagManager.parseTag(tag)
                 repository.saveTag(tagInfo)
@@ -81,20 +80,4 @@ class NfcViewModel(
         viewModelScope.launch { repository.clearHistory() }
     }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val c = app.container
-                return NfcViewModel(
-                    nfcTagManager = c.nfcTagManager,
-                    repository = c.nfcRepository,
-                    nfcTagFlow = c.nfcTagFlow,
-                    isNfcAvailable = c.nfcAdapter != null,
-                    isNfcEnabled = c.nfcAdapter?.isEnabled == true
-                ) as T
-            }
-        }
-    }
 }

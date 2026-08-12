@@ -1,10 +1,7 @@
 package com.abhishek.zerodroid.features.hidden_camera.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.hidden_camera.domain.CameraDetection
 import com.abhishek.zerodroid.features.hidden_camera.domain.DetectionSource
@@ -13,6 +10,7 @@ import com.abhishek.zerodroid.features.hidden_camera.domain.HiddenCameraScanStat
 import com.abhishek.zerodroid.features.sensors.domain.MetalDetector
 import com.abhishek.zerodroid.features.sensors.domain.SensorDataCollector
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +18,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import javax.inject.Inject
 
-class HiddenCameraViewModel(
+@HiltViewModel
+class HiddenCameraViewModel @Inject constructor(
     private val detector: HiddenCameraDetector,
     private val wifiScanner: WifiScanner,
     private val bleScanner: BleScanner,
@@ -208,21 +208,5 @@ class HiddenCameraViewModel(
     override fun onCleared() {
         super.onCleared()
         stopScan()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val container = app.container
-                return HiddenCameraViewModel(
-                    detector = container.hiddenCameraDetector,
-                    wifiScanner = container.wifiScanner,
-                    bleScanner = container.bleScanner,
-                    sensorDataCollector = container.sensorDataCollector
-                ) as T
-            }
-        }
     }
 }

@@ -26,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -42,7 +42,7 @@ import com.abhishek.zerodroid.ui.theme.TerminalRed
 
 @Composable
 fun WifiDirectScreen(
-    viewModel: WifiDirectViewModel = viewModel(factory = WifiDirectViewModel.Factory)
+    viewModel: WifiDirectViewModel = hiltViewModel()
 ) {
     PermissionGate(
         permissions = PermissionUtils.wifiDirectPermissions(),

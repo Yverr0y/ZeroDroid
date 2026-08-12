@@ -1,16 +1,14 @@
 package com.abhishek.zerodroid.features.bluetooth_tracker.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.bluetooth_tracker.domain.DetectedTracker
 import com.abhishek.zerodroid.features.bluetooth_tracker.domain.TrackerIdentifier
 import com.abhishek.zerodroid.features.bluetooth_tracker.domain.TrackerScanState
 import com.abhishek.zerodroid.features.bluetooth_tracker.domain.TrackerType
 import com.abhishek.zerodroid.features.bluetooth_tracker.domain.TrackingRisk
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +17,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BluetoothTrackerViewModel(
+@HiltViewModel
+class BluetoothTrackerViewModel @Inject constructor(
     private val bleScanner: BleScanner
 ) : ViewModel() {
 
@@ -140,15 +140,5 @@ class BluetoothTrackerViewModel(
     override fun onCleared() {
         super.onCleared()
         stopScan()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return BluetoothTrackerViewModel(app.container.bleScanner) as T
-            }
-        }
     }
 }

@@ -51,7 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.EmptyState
 import com.abhishek.zerodroid.core.ui.ScanningIndicator
 import com.abhishek.zerodroid.core.ui.TerminalCard
@@ -71,7 +71,7 @@ import kotlin.math.sin
 
 @Composable
 fun EmfMapperScreen(
-    viewModel: EmfMapperViewModel = viewModel(factory = EmfMapperViewModel.Factory)
+    viewModel: EmfMapperViewModel = hiltViewModel()
 ) {
     DisposableEffect(Unit) {
         onDispose {

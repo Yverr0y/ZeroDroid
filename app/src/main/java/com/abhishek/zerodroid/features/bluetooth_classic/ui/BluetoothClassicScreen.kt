@@ -41,7 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -58,7 +58,7 @@ import com.abhishek.zerodroid.ui.theme.TerminalRed
 
 @Composable
 fun BluetoothClassicScreen(
-    viewModel: BluetoothClassicViewModel = viewModel(factory = BluetoothClassicViewModel.Factory)
+    viewModel: BluetoothClassicViewModel = hiltViewModel()
 ) {
     PermissionGate(
         permissions = PermissionUtils.blePermissions(),

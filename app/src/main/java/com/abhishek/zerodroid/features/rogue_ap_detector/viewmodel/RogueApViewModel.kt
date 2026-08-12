@@ -1,21 +1,21 @@
 package com.abhishek.zerodroid.features.rogue_ap_detector.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.rogue_ap_detector.domain.RogueApAnalyzer
 import com.abhishek.zerodroid.features.rogue_ap_detector.domain.RogueApState
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RogueApViewModel(
+@HiltViewModel
+class RogueApViewModel @Inject constructor(
     private val wifiScanner: WifiScanner
 ) : ViewModel() {
 
@@ -88,15 +88,5 @@ class RogueApViewModel(
     override fun onCleared() {
         super.onCleared()
         stopScan()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return RogueApViewModel(app.container.wifiScanner) as T
-            }
-        }
     }
 }

@@ -1,16 +1,15 @@
 package com.abhishek.zerodroid.features.dashboard
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
+import com.abhishek.zerodroid.core.di.DashboardPrefs
 import com.abhishek.zerodroid.core.hardware.HardwareChecker
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 data class DeviceInfo(
     val model: String = "${Build.MANUFACTURER.uppercase()} ${Build.MODEL}",
@@ -29,9 +28,10 @@ data class LastUsedFeature(
     val title: String
 )
 
-class DashboardViewModel(
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
     private val hardwareChecker: HardwareChecker,
-    private val prefs: SharedPreferences
+    @DashboardPrefs private val prefs: SharedPreferences
 ) : ViewModel() {
 
     val deviceInfo = DeviceInfo()
@@ -76,17 +76,7 @@ class DashboardViewModel(
     }
 
     companion object {
-        private const val PREFS_NAME = "zerodroid_dashboard"
         private const val KEY_LAST_ROUTE = "last_used_route"
         private const val KEY_LAST_TITLE = "last_used_title"
-
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val prefs = app.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                return DashboardViewModel(app.container.hardwareChecker, prefs) as T
-            }
-        }
     }
 }

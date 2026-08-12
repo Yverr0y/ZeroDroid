@@ -51,7 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -79,7 +79,7 @@ import kotlin.math.sin
 
 @Composable
 fun ProximityRadarScreen(
-    viewModel: ProximityRadarViewModel = viewModel(factory = ProximityRadarViewModel.Factory)
+    viewModel: ProximityRadarViewModel = hiltViewModel()
 ) {
     val combinedPermissions = (PermissionUtils.blePermissions() + PermissionUtils.wifiPermissions()).distinct()
 

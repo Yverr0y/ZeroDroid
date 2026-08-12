@@ -55,7 +55,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -83,7 +83,7 @@ import java.util.Locale
 
 @Composable
 fun HiddenCameraScreen(
-    viewModel: HiddenCameraViewModel = viewModel(factory = HiddenCameraViewModel.Factory)
+    viewModel: HiddenCameraViewModel = hiltViewModel()
 ) {
     PermissionGate(
         permissions = PermissionUtils.hiddenCameraPermissions(),

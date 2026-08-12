@@ -22,18 +22,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.abhishek.zerodroid.ZeroDroidApp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.StatusIndicator
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.ir.domain.IrScreenTab
 import com.abhishek.zerodroid.features.ir.viewmodel.IrViewModel
 
 @Composable
-fun IrScreen(viewModel: IrViewModel = viewModel(factory = IrViewModel.Factory)) {
-    val app = LocalContext.current.applicationContext as ZeroDroidApp
+fun IrScreen(viewModel: IrViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

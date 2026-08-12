@@ -1,18 +1,18 @@
 package com.abhishek.zerodroid.features.wifiaware.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.wifiaware.domain.WifiAwareService
 import com.abhishek.zerodroid.features.wifiaware.domain.WifiAwareState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WifiAwareViewModel(
+@HiltViewModel
+class WifiAwareViewModel @Inject constructor(
     private val service: WifiAwareService
 ) : ViewModel() {
 
@@ -82,15 +82,5 @@ class WifiAwareViewModel(
     override fun onCleared() {
         super.onCleared()
         service.detach()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return WifiAwareViewModel(app.container.wifiAwareService) as T
-            }
-        }
     }
 }

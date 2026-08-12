@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.navigation.ScreenCategory
 import com.abhishek.zerodroid.navigation.ZeroDroidScreen
@@ -36,7 +36,7 @@ import com.abhishek.zerodroid.ui.theme.TextDim
 @Composable
 fun DashboardScreen(
     onNavigate: (String) -> Unit,
-    viewModel: DashboardViewModel = viewModel(factory = DashboardViewModel.Factory)
+    viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val hardwareItems by viewModel.hardwareItems.collectAsState()
     val lastUsed by viewModel.lastUsedFeature.collectAsState()
@@ -110,7 +110,7 @@ fun DashboardScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Tap to resume \u2192",
+                        text = "Tap to resume →",
                         style = MaterialTheme.typography.labelSmall,
                         color = TerminalGreen
                     )

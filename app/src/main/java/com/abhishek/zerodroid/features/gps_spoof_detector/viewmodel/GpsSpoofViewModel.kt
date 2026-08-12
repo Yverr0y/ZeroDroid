@@ -1,10 +1,7 @@
 package com.abhishek.zerodroid.features.gps_spoof_detector.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.celltower.domain.CellTowerAnalyzer
 import com.abhishek.zerodroid.features.celltower.domain.CellTowerState
 import com.abhishek.zerodroid.features.gps.domain.GpsState
@@ -15,6 +12,7 @@ import com.abhishek.zerodroid.features.gps_spoof_detector.domain.SpoofCheckResul
 import com.abhishek.zerodroid.features.sensors.domain.SensorDataCollector
 import com.abhishek.zerodroid.features.wifi.domain.WifiAccessPoint
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +20,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GpsSpoofViewModel(
+@HiltViewModel
+class GpsSpoofViewModel @Inject constructor(
     private val gpsTracker: GpsTracker,
     private val cellTowerAnalyzer: CellTowerAnalyzer,
     private val wifiScanner: WifiScanner,
@@ -175,22 +175,5 @@ class GpsSpoofViewModel(
     override fun onCleared() {
         super.onCleared()
         stopMonitoring()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val container = app.container
-                return GpsSpoofViewModel(
-                    gpsTracker = container.gpsTracker,
-                    cellTowerAnalyzer = container.cellTowerAnalyzer,
-                    wifiScanner = container.wifiScanner,
-                    sensorDataCollector = container.sensorDataCollector,
-                    spoofDetector = GpsSpoofDetector(app.applicationContext)
-                ) as T
-            }
-        }
     }
 }

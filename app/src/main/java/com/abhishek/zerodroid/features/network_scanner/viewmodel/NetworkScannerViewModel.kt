@@ -2,22 +2,23 @@ package com.abhishek.zerodroid.features.network_scanner.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.network_scanner.domain.NetworkScanState
 import com.abhishek.zerodroid.features.network_scanner.domain.NetworkVulnerabilityScanner
 import com.abhishek.zerodroid.features.network_scanner.domain.VulnerabilityLevel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NetworkScannerViewModel(
+@HiltViewModel
+class NetworkScannerViewModel @Inject constructor(
     private val scanner: NetworkVulnerabilityScanner,
-    private val appContext: Context
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NetworkScanState())
@@ -133,18 +134,5 @@ class NetworkScannerViewModel(
     override fun onCleared() {
         super.onCleared()
         stopScan()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return NetworkScannerViewModel(
-                    scanner = NetworkVulnerabilityScanner(app.container.wifiScanner, app.applicationContext),
-                    appContext = app.applicationContext
-                ) as T
-            }
-        }
     }
 }

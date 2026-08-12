@@ -2,14 +2,14 @@ package com.abhishek.zerodroid.features.wifi_direct.viewmodel
 
 import android.content.BroadcastReceiver
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.wifi_direct.domain.WifiDirectManager
 import com.abhishek.zerodroid.features.wifi_direct.domain.WifiDirectState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-class WifiDirectViewModel(
+@HiltViewModel
+class WifiDirectViewModel @Inject constructor(
     private val manager: WifiDirectManager
 ) : ViewModel() {
 
@@ -32,15 +32,5 @@ class WifiDirectViewModel(
         manager.stopDiscovery()
         receiver?.let { manager.unregisterReceiver(it) }
         manager.cleanup()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return WifiDirectViewModel(app.container.wifiDirectManager) as T
-            }
-        }
     }
 }

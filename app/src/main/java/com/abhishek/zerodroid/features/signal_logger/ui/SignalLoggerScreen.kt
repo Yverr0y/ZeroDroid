@@ -51,7 +51,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -90,7 +90,7 @@ private enum class LogFilter(val label: String) {
 
 @Composable
 fun SignalLoggerScreen(
-    viewModel: SignalLoggerViewModel = viewModel(factory = SignalLoggerViewModel.Factory)
+    viewModel: SignalLoggerViewModel = hiltViewModel()
 ) {
     val combinedPermissions = (PermissionUtils.wifiPermissions() + PermissionUtils.blePermissions()).distinct()
 

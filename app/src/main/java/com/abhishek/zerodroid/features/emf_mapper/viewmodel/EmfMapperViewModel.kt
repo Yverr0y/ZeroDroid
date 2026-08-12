@@ -1,22 +1,22 @@
 package com.abhishek.zerodroid.features.emf_mapper.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.emf_mapper.domain.EmfDataProcessor
 import com.abhishek.zerodroid.features.emf_mapper.domain.EmfMapperState
 import com.abhishek.zerodroid.features.sensors.domain.MetalDetector
 import com.abhishek.zerodroid.features.sensors.domain.SensorDataCollector
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EmfMapperViewModel(
+@HiltViewModel
+class EmfMapperViewModel @Inject constructor(
     private val sensorDataCollector: SensorDataCollector
 ) : ViewModel() {
 
@@ -139,15 +139,5 @@ class EmfMapperViewModel(
         recordingJob?.cancel()
         timerJob?.cancel()
         sensorDataCollector.stop()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return EmfMapperViewModel(app.container.sensorDataCollector) as T
-            }
-        }
     }
 }

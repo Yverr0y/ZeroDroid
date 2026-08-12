@@ -1,10 +1,7 @@
 package com.abhishek.zerodroid.features.rf_bug_sweeper.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.rf_bug_sweeper.domain.BugDetection
 import com.abhishek.zerodroid.features.rf_bug_sweeper.domain.BugSweepState
@@ -13,6 +10,7 @@ import com.abhishek.zerodroid.features.rf_bug_sweeper.domain.SweepMode
 import com.abhishek.zerodroid.features.sensors.domain.MetalDetector
 import com.abhishek.zerodroid.features.sensors.domain.SensorDataCollector
 import com.abhishek.zerodroid.features.ultrasonic.domain.UltrasonicAnalyzer
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +18,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RfBugSweeperViewModel(
+@HiltViewModel
+class RfBugSweeperViewModel @Inject constructor(
     private val bleScanner: BleScanner,
     private val ultrasonicAnalyzer: UltrasonicAnalyzer,
     private val sensorDataCollector: SensorDataCollector
@@ -224,20 +224,5 @@ class RfBugSweeperViewModel(
     override fun onCleared() {
         super.onCleared()
         stopSweep()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val c = app.container
-                return RfBugSweeperViewModel(
-                    bleScanner = c.bleScanner,
-                    ultrasonicAnalyzer = c.ultrasonicAnalyzer,
-                    sensorDataCollector = c.sensorDataCollector
-                ) as T
-            }
-        }
     }
 }

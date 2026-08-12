@@ -23,7 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -32,7 +32,7 @@ import com.abhishek.zerodroid.features.ble.viewmodel.BleViewModel
 
 @Composable
 fun BleScreen(
-    viewModel: BleViewModel = viewModel(factory = BleViewModel.Factory)
+    viewModel: BleViewModel = hiltViewModel()
 ) {
     PermissionGate(
         permissions = PermissionUtils.blePermissions(),

@@ -2,10 +2,7 @@ package com.abhishek.zerodroid.features.camera.viewmodel
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.camera.data.QrRepository
 import com.abhishek.zerodroid.features.camera.domain.QrContentParser
 import com.abhishek.zerodroid.features.camera.domain.QrGenerator
@@ -14,10 +11,12 @@ import com.abhishek.zerodroid.features.camera.domain.QrScannerState
 import com.abhishek.zerodroid.features.camera.domain.QrScreenTab
 import com.abhishek.zerodroid.features.camera.domain.QrThreatAnalyzer
 import com.google.mlkit.vision.barcode.common.Barcode
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 enum class QrGeneratorInputType(val displayName: String) {
     TEXT("Text"), URL("URL"), WIFI("WiFi")
@@ -41,7 +40,8 @@ data class QrGeneratorState(
         }
 }
 
-class QrScannerViewModel(
+@HiltViewModel
+class QrScannerViewModel @Inject constructor(
     private val repository: QrRepository
 ) : ViewModel() {
 
@@ -142,16 +142,6 @@ class QrScannerViewModel(
             _generatorState.value.copy(generatedBitmap = bitmap, encodedContent = content, errorMessage = null)
         } else {
             _generatorState.value.copy(generatedBitmap = null, errorMessage = "Failed to generate QR code.")
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return QrScannerViewModel(app.container.qrRepository) as T
-            }
         }
     }
 }

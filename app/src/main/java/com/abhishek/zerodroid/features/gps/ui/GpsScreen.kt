@@ -32,7 +32,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -49,7 +49,7 @@ import com.abhishek.zerodroid.ui.theme.TextDim
 
 @Composable
 fun GpsScreen(
-    viewModel: GpsViewModel = viewModel(factory = GpsViewModel.Factory)
+    viewModel: GpsViewModel = hiltViewModel()
 ) {
     PermissionGate(
         permissions = PermissionUtils.gpsPermissions(),

@@ -18,7 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.ScanningIndicator
 import com.abhishek.zerodroid.core.ui.StatusIndicator
 import com.abhishek.zerodroid.core.ui.TerminalCard
@@ -26,7 +26,7 @@ import com.abhishek.zerodroid.features.nfc.viewmodel.NfcViewModel
 
 @Composable
 fun NfcScreen(
-    viewModel: NfcViewModel = viewModel(factory = NfcViewModel.Factory)
+    viewModel: NfcViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 

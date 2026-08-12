@@ -27,7 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.TerminalCard
@@ -35,7 +35,7 @@ import com.abhishek.zerodroid.features.ultrasonic.domain.UltrasonicScreenTab
 import com.abhishek.zerodroid.features.ultrasonic.viewmodel.UltrasonicViewModel
 
 @Composable
-fun UltrasonicScreen(viewModel: UltrasonicViewModel = viewModel(factory = UltrasonicViewModel.Factory)) {
+fun UltrasonicScreen(viewModel: UltrasonicViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

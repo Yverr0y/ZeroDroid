@@ -1,24 +1,24 @@
 package com.abhishek.zerodroid.features.proximity_radar.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.proximity_radar.domain.DeviceCategory
 import com.abhishek.zerodroid.features.proximity_radar.domain.ProximityCalculator
 import com.abhishek.zerodroid.features.proximity_radar.domain.RadarDevice
 import com.abhishek.zerodroid.features.proximity_radar.domain.RadarState
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProximityRadarViewModel(
+@HiltViewModel
+class ProximityRadarViewModel @Inject constructor(
     private val bleScanner: BleScanner,
     private val wifiScanner: WifiScanner
 ) : ViewModel() {
@@ -127,15 +127,5 @@ class ProximityRadarViewModel(
     override fun onCleared() {
         super.onCleared()
         stopScan()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return ProximityRadarViewModel(app.container.bleScanner, app.container.wifiScanner) as T
-            }
-        }
     }
 }

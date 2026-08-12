@@ -1,16 +1,14 @@
 package com.abhishek.zerodroid.features.signal_logger.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.signal_logger.domain.SignalLogEntry
 import com.abhishek.zerodroid.features.signal_logger.domain.SignalLoggerState
 import com.abhishek.zerodroid.features.signal_logger.domain.SignalStats
 import com.abhishek.zerodroid.features.signal_logger.domain.SignalType
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +19,10 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
-class SignalLoggerViewModel(
+@HiltViewModel
+class SignalLoggerViewModel @Inject constructor(
     private val wifiScanner: WifiScanner,
     private val bleScanner: BleScanner
 ) : ViewModel() {
@@ -338,14 +338,5 @@ class SignalLoggerViewModel(
 
     companion object {
         private const val MAX_ENTRIES = 500
-
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val c = app.container
-                return SignalLoggerViewModel(c.wifiScanner, c.bleScanner) as T
-            }
-        }
     }
 }

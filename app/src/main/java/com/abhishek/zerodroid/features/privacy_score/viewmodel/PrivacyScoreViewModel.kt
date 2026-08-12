@@ -6,10 +6,7 @@ import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ble.domain.BleDevice
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.privacy_score.domain.CheckStatus
@@ -19,6 +16,8 @@ import com.abhishek.zerodroid.features.privacy_score.domain.PrivacyScoreState
 import com.abhishek.zerodroid.features.sensors.domain.SensorDataCollector
 import com.abhishek.zerodroid.features.wifi.domain.WifiAccessPoint
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,12 +27,14 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import javax.inject.Inject
 
-class PrivacyScoreViewModel(
+@HiltViewModel
+class PrivacyScoreViewModel @Inject constructor(
     private val wifiScanner: WifiScanner,
     private val bleScanner: BleScanner,
     private val sensorDataCollector: SensorDataCollector,
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PrivacyScoreState())
@@ -199,21 +200,5 @@ class PrivacyScoreViewModel(
         super.onCleared()
         scanJob?.cancel()
         sensorDataCollector.stop()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                val c = app.container
-                return PrivacyScoreViewModel(
-                    c.wifiScanner,
-                    c.bleScanner,
-                    c.sensorDataCollector,
-                    app.applicationContext
-                ) as T
-            }
-        }
     }
 }

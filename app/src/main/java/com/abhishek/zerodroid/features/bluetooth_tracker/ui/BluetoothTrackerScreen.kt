@@ -46,7 +46,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
@@ -73,7 +73,7 @@ import com.abhishek.zerodroid.ui.theme.TextSecondary
 
 @Composable
 fun BluetoothTrackerScreen(
-    viewModel: BluetoothTrackerViewModel = viewModel(factory = BluetoothTrackerViewModel.Factory)
+    viewModel: BluetoothTrackerViewModel = hiltViewModel()
 ) {
     PermissionGate(
         permissions = PermissionUtils.blePermissions(),

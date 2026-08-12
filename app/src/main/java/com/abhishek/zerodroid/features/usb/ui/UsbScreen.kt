@@ -15,19 +15,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.abhishek.zerodroid.ZeroDroidApp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.EmptyState
 import com.abhishek.zerodroid.core.ui.StatusIndicator
 import com.abhishek.zerodroid.features.usb.viewmodel.UsbViewModel
 
 @Composable
 fun UsbScreen(
-    viewModel: UsbViewModel = viewModel(factory = UsbViewModel.Factory)
+    viewModel: UsbViewModel = hiltViewModel()
 ) {
-    val app = LocalContext.current.applicationContext as ZeroDroidApp
     val state by viewModel.state.collectAsState()
 
     LazyColumn(
@@ -38,7 +35,7 @@ fun UsbScreen(
     ) {
         item {
             Spacer(modifier = Modifier.height(4.dp))
-            StatusIndicator(isAvailable = app.container.hardwareChecker.hasUsbHost())
+            StatusIndicator(isAvailable = viewModel.hasUsbHost)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "> ${state.devices.size} USB device(s) connected",

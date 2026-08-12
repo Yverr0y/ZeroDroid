@@ -1,14 +1,12 @@
 package com.abhishek.zerodroid.features.ultrasonic.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ultrasonic.domain.ToneGenerator
 import com.abhishek.zerodroid.features.ultrasonic.domain.UltrasonicAnalyzer
 import com.abhishek.zerodroid.features.ultrasonic.domain.UltrasonicScreenTab
 import com.abhishek.zerodroid.features.ultrasonic.domain.UltrasonicState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UltrasonicViewModel(
+@HiltViewModel
+class UltrasonicViewModel @Inject constructor(
     private val analyzer: UltrasonicAnalyzer
 ) : ViewModel() {
 
@@ -67,14 +67,4 @@ class UltrasonicViewModel(
     }
 
     override fun onCleared() { super.onCleared(); stopAnalysis(); stopTone() }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return UltrasonicViewModel(app.container.ultrasonicAnalyzer) as T
-            }
-        }
-    }
 }

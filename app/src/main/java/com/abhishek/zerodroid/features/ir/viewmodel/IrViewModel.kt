@@ -1,9 +1,6 @@
 package com.abhishek.zerodroid.features.ir.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.ir.domain.FlipperIrParser
 import com.abhishek.zerodroid.features.ir.domain.IrProtocol
 import com.abhishek.zerodroid.features.ir.domain.IrRemoteButton
@@ -12,11 +9,14 @@ import com.abhishek.zerodroid.features.ir.domain.IrRemoteState
 import com.abhishek.zerodroid.features.ir.domain.IrScreenTab
 import com.abhishek.zerodroid.features.ir.domain.IrSignal
 import com.abhishek.zerodroid.features.ir.domain.IrTransmitter
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
-class IrViewModel(
+@HiltViewModel
+class IrViewModel @Inject constructor(
     private val irTransmitter: IrTransmitter
 ) : ViewModel() {
 
@@ -62,15 +62,5 @@ class IrViewModel(
         )
         val result = irTransmitter.transmit(signal)
         _state.value = _state.value.copy(lastTransmitResult = result)
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return IrViewModel(app.container.irTransmitter) as T
-            }
-        }
     }
 }

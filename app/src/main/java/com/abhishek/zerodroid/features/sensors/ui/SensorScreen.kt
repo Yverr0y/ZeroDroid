@@ -24,7 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.EmptyState
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.sensors.viewmodel.SensorViewModel
@@ -33,7 +33,7 @@ import java.util.Locale
 
 @Composable
 fun SensorScreen(
-    viewModel: SensorViewModel = viewModel(factory = SensorViewModel.Factory)
+    viewModel: SensorViewModel = hiltViewModel()
 ) {
     val isMonitoring by viewModel.isMonitoring.collectAsState()
     val accelerometer by viewModel.accelerometer.collectAsState()

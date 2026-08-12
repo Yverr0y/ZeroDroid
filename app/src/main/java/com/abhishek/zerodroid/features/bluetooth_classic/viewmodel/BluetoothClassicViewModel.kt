@@ -1,22 +1,22 @@
 package com.abhishek.zerodroid.features.bluetooth_classic.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.abhishek.zerodroid.ZeroDroidApp
 import com.abhishek.zerodroid.features.bluetooth_classic.domain.BluetoothClassicScanner
 import com.abhishek.zerodroid.features.bluetooth_classic.domain.BluetoothClassicState
 import com.abhishek.zerodroid.features.bluetooth_classic.domain.SppConnectionManager
 import com.abhishek.zerodroid.features.bluetooth_classic.domain.SppState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BluetoothClassicViewModel(
+@HiltViewModel
+class BluetoothClassicViewModel @Inject constructor(
     private val scanner: BluetoothClassicScanner,
     private val sppManager: SppConnectionManager
 ) : ViewModel() {
@@ -84,18 +84,5 @@ class BluetoothClassicViewModel(
         super.onCleared()
         stopScan()
         sppManager.disconnect()
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val app = extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ZeroDroidApp
-                return BluetoothClassicViewModel(
-                    app.container.bluetoothClassicScanner,
-                    app.container.sppConnectionManager
-                ) as T
-            }
-        }
     }
 }

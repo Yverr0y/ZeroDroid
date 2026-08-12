@@ -56,7 +56,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.EmptyState
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.ble.domain.BleUuidDatabase
@@ -86,7 +86,7 @@ fun GattExplorerScreen(
     deviceAddress: String,
     deviceName: String?,
     onBack: () -> Unit,
-    viewModel: GattViewModel = viewModel(factory = GattViewModel.Factory)
+    viewModel: GattViewModel = hiltViewModel()
 ) {
     val connState by viewModel.connectionState.collectAsState()
     val detailState by viewModel.detailState.collectAsState()
