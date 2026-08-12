@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.flowOn
 class UltrasonicAnalyzer {
 
     companion object {
+        private const val TAG = "UltrasonicAnalyzer"
         const val SAMPLE_RATE = 48000
         const val FFT_SIZE = 4096
         const val BIN_RESOLUTION = SAMPLE_RATE.toFloat() / FFT_SIZE // ~11.7 Hz
@@ -96,7 +98,9 @@ class UltrasonicAnalyzer {
             try {
                 recorder.stop()
                 recorder.release()
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                Log.d(TAG, "Failed to stop/release AudioRecord", e)
+            }
         }
     }.flowOn(Dispatchers.Default)
 }

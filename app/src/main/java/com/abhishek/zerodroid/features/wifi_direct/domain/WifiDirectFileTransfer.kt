@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.provider.OpenableColumns
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +49,7 @@ data class TransferHistoryEntry(
 
 class WifiDirectFileTransfer(private val context: Context) {
     companion object {
+        private const val TAG = "WifiDirectFileTransfer"
         const val PORT = 8988
         const val BUFFER_SIZE = 8192
         private const val SOCKET_TIMEOUT = 15_000
@@ -282,7 +284,9 @@ class WifiDirectFileTransfer(private val context: Context) {
     fun cancel() {
         try {
             clientSocket?.close()
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to close client socket during cancel", e)
+        }
         closeServerSocket()
         clientSocket = null
         _progress.value = TransferProgress(TransferState.Idle)
@@ -291,7 +295,9 @@ class WifiDirectFileTransfer(private val context: Context) {
     private fun closeServerSocket() {
         try {
             serverSocket?.close()
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to close server socket", e)
+        }
         serverSocket = null
     }
 

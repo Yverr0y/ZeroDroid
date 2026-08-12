@@ -3,6 +3,7 @@ package com.abhishek.zerodroid.features.bluetooth_classic.domain
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +16,7 @@ class SppConnectionManager(
     private val bluetoothManager: BluetoothManager?
 ) {
     companion object {
+        private const val TAG = "SppConnectionManager"
         val SPP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     }
 
@@ -84,7 +86,9 @@ class SppConnectionManager(
     fun disconnect() {
         try {
             socket?.close()
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to close SPP socket during disconnect", e)
+        }
         socket = null
         _sppState.value = SppState()
     }

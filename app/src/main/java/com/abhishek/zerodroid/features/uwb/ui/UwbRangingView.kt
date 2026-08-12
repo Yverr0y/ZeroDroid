@@ -9,13 +9,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.abhishek.zerodroid.features.uwb.domain.UwbRangingMeasurement
 import com.abhishek.zerodroid.ui.theme.TerminalGreen
 import com.abhishek.zerodroid.ui.theme.TerminalGreenDark
+import kotlin.math.cos
+import kotlin.math.sin
+
+private const val DISPLAY_MAX_DISTANCE_M = 10f
 
 @Composable
-fun UwbRangingView(modifier: Modifier = Modifier) {
+fun UwbRangingView(
+    measurement: UwbRangingMeasurement? = null,
+    modifier: Modifier = Modifier
+) {
     val ringColor = TerminalGreen
     val dimColor = TerminalGreenDark
+    val peerColor = MaterialTheme.colorScheme.error
 
     Canvas(
         modifier = modifier
@@ -42,5 +51,19 @@ fun UwbRangingView(modifier: Modifier = Modifier) {
 
         // Center dot (self)
         drawCircle(ringColor, radius = 6f, center = center)
+
+        // Peer position, if a live distance reading is available. Azimuth of 0 points
+        // "up" (away from self); missing azimuth falls back to straight ahead.
+        val distance = measurement?.distanceMeters
+        if (distance != null) {
+            val clampedDistance = distance.coerceIn(0f, DISPLAY_MAX_DISTANCE_M)
+            val radius = (clampedDistance / DISPLAY_MAX_DISTANCE_M) * maxRadius
+            val azimuthRad = Math.toRadians((measurement.azimuthDegrees ?: 0f).toDouble())
+            val peerOffset = Offset(
+                x = center.x + (radius * sin(azimuthRad)).toFloat(),
+                y = center.y - (radius * cos(azimuthRad)).toFloat()
+            )
+            drawCircle(peerColor, radius = 8f, center = peerOffset)
+        }
     }
 }

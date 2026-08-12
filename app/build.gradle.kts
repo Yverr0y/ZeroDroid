@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.zxing.core)
     implementation(libs.play.services.location)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.core.uwb)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

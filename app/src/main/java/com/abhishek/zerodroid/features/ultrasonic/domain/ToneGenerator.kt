@@ -3,11 +3,13 @@ package com.abhishek.zerodroid.features.ultrasonic.domain
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
+import android.util.Log
 import kotlin.math.PI
 import kotlin.math.sin
 
 class ToneGenerator {
     companion object {
+        private const val TAG = "ToneGenerator"
         const val SAMPLE_RATE = 48000
         const val MIN_FREQUENCY = 18000
         const val MAX_FREQUENCY = 24000
@@ -55,8 +57,16 @@ class ToneGenerator {
 
     fun stop() {
         isPlaying = false
-        try { audioTrack?.stop() } catch (_: Exception) {}
-        try { audioTrack?.release() } catch (_: Exception) {}
+        try {
+            audioTrack?.stop()
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to stop audio track", e)
+        }
+        try {
+            audioTrack?.release()
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to release audio track", e)
+        }
         audioTrack = null
     }
 

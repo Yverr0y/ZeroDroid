@@ -5,6 +5,7 @@ import android.content.Context
 import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import com.abhishek.zerodroid.features.celltower.domain.CellTowerInfo
 import com.abhishek.zerodroid.features.gps.domain.GpsState
 import com.abhishek.zerodroid.features.sensors.domain.SensorReading
@@ -51,6 +52,7 @@ data class GpsSpoofState(
 class GpsSpoofDetector(private val context: Context) {
 
     companion object {
+        private const val TAG = "GpsSpoofDetector"
         private const val EARTH_RADIUS_KM = 6371.0
         private const val CELL_DISTANCE_THRESHOLD_KM = 50.0
         private const val WIFI_DISTANCE_THRESHOLD_KM = 5.0
@@ -287,8 +289,8 @@ class GpsSpoofDetector(private val context: Context) {
                 mockDetected = true
                 details += "Mock location setting enabled"
             }
-        } catch (_: Exception) {
-            // Setting may not exist on newer devices
+        } catch (e: Exception) {
+            Log.d(TAG, "ALLOW_MOCK_LOCATION setting unavailable on this device", e)
         }
 
         // Check 2: Check if a mock location provider is registered
@@ -304,7 +306,9 @@ class GpsSpoofDetector(private val context: Context) {
                             details += "Mock provider detected: $provider"
                         }
                     }
-                } catch (_: Exception) { }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to inspect location provider '$provider'", e)
+                }
             }
 
             // Check test providers via reflection if accessible
@@ -315,9 +319,13 @@ class GpsSpoofDetector(private val context: Context) {
                         mockDetected = true
                         details += "Last known GPS location flagged as mock"
                     }
-                } catch (_: SecurityException) { }
+                } catch (e: SecurityException) {
+                    Log.w(TAG, "Missing permission to read last known GPS location", e)
+                }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.w(TAG, "Mock location provider check failed", e)
+        }
 
         return SpoofCheck(
             name = "Mock Location Provider",
@@ -343,7 +351,9 @@ class GpsSpoofDetector(private val context: Context) {
             if (networkLocation != null) {
                 return Pair(networkLocation.latitude, networkLocation.longitude)
             }
-        } catch (_: SecurityException) { }
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Missing permission to read network-provider location for cell estimate", e)
+        }
         return null
     }
 
@@ -361,7 +371,9 @@ class GpsSpoofDetector(private val context: Context) {
             if (networkLocation != null) {
                 return Pair(networkLocation.latitude, networkLocation.longitude)
             }
-        } catch (_: SecurityException) { }
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Missing permission to read network-provider location for WiFi estimate", e)
+        }
         return null
     }
 

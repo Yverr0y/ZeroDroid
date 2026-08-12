@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,6 +19,10 @@ class BluetoothClassicScanner(
     private val context: Context,
     private val bluetoothManager: BluetoothManager?
 ) {
+
+    companion object {
+        private const val TAG = "BluetoothClassicScanner"
+    }
 
     private val adapter: BluetoothAdapter?
         get() = bluetoothManager?.adapter
@@ -73,7 +78,11 @@ class BluetoothClassicScanner(
 
         awaitClose {
             adapter?.cancelDiscovery()
-            try { context.unregisterReceiver(receiver) } catch (_: Exception) {}
+            try {
+                context.unregisterReceiver(receiver)
+            } catch (e: Exception) {
+                Log.d(TAG, "Receiver was already unregistered", e)
+            }
         }
     }
 

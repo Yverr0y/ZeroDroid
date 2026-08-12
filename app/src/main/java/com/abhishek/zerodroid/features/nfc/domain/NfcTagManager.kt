@@ -8,8 +8,13 @@ import android.nfc.tech.MifareClassic
 import android.nfc.tech.MifareUltralight
 import android.nfc.tech.Ndef
 import android.nfc.tech.NfcA
+import android.util.Log
 
 class NfcTagManager {
+
+    companion object {
+        private const val TAG = "NfcTagManager"
+    }
 
     fun parseTag(tag: Tag): NfcTagInfo {
         val uid = tag.id.joinToString(":") { "%02X".format(it) }
@@ -24,7 +29,9 @@ class NfcTagManager {
                 atqa = nfcA.atqa.joinToString(" ") { "%02X".format(it) }
                 sak = "%02X".format(nfcA.sak.toInt())
             }
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.d(TAG, "Tag does not support NFC-A (no ATQA/SAK)", e)
+        }
 
         val ndefMessages = try {
             val ndef = Ndef.get(tag)
@@ -32,7 +39,8 @@ class NfcTagManager {
             val msg = ndef?.ndefMessage
             ndef?.close()
             msg?.let { NdefParser.parse(it) } ?: emptyList()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to read NDEF messages from tag", e)
             emptyList()
         }
 

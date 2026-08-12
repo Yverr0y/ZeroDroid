@@ -2,6 +2,7 @@ package com.abhishek.zerodroid.features.nfc.domain
 
 import android.nfc.Tag
 import android.nfc.tech.MifareClassic
+import android.util.Log
 
 data class MifareSectorData(
     val sectorIndex: Int,
@@ -27,6 +28,8 @@ data class MifareBlockData(
 class MifareClassicReader {
 
     companion object {
+        private const val TAG = "MifareClassicReader"
+
         val DEFAULT_KEYS: List<ByteArray> = listOf(
             byteArrayOf(0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte()),
             byteArrayOf(0xA0.toByte(), 0xA1.toByte(), 0xA2.toByte(), 0xA3.toByte(), 0xA4.toByte(), 0xA5.toByte()),
@@ -69,7 +72,8 @@ class MifareClassicReader {
                 var keyType = ""
 
                 for (key in allKeys) {
-                    // Try Key A first
+                    // Try Key A first. A wrong-key exception here is expected and
+                    // noisy (up to allKeys x sectors x 2 attempts) - log at verbose only.
                     try {
                         if (mifare.authenticateSectorWithKeyA(sectorIndex, key)) {
                             authenticated = true
@@ -77,7 +81,9 @@ class MifareClassicReader {
                             keyType = "A"
                             break
                         }
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Log.v(TAG, "Key A auth failed for sector $sectorIndex", e)
+                    }
 
                     // Try Key B
                     try {
@@ -87,7 +93,9 @@ class MifareClassicReader {
                             keyType = "B"
                             break
                         }
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Log.v(TAG, "Key B auth failed for sector $sectorIndex", e)
+                    }
                 }
 
                 val blocks = mutableListOf<MifareBlockData>()
@@ -127,9 +135,12 @@ class MifareClassicReader {
                     )
                 )
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.w(TAG, "Sector read loop aborted early, returning ${sectors.size} sector(s) read so far", e)
         } finally {
-            try { mifare.close() } catch (_: Exception) {}
+            try { mifare.close() } catch (e: Exception) {
+                Log.d(TAG, "Failed to close MIFARE connection", e)
+            }
         }
 
         return sectors
@@ -173,10 +184,13 @@ class MifareClassicReader {
 
             mifare.writeBlock(blockIndex, data)
             true
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.w(TAG, "Write to block $blockIndex failed", e)
             false
         } finally {
-            try { mifare.close() } catch (_: Exception) {}
+            try { mifare.close() } catch (e: Exception) {
+                Log.d(TAG, "Failed to close MIFARE connection", e)
+            }
         }
     }
 

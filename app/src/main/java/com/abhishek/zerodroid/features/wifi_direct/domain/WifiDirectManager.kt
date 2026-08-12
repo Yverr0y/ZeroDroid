@@ -13,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Build
 import android.os.Looper
+import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 
 class WifiDirectManager(private val context: Context) {
+
+    companion object {
+        private const val TAG = "WifiDirectManager"
+    }
 
     private val manager: WifiP2pManager? =
         context.getSystemService(Context.WIFI_P2P_SERVICE) as? WifiP2pManager
@@ -152,7 +157,11 @@ class WifiDirectManager(private val context: Context) {
     }
 
     fun unregisterReceiver(receiver: BroadcastReceiver) {
-        try { context.unregisterReceiver(receiver) } catch (_: Exception) {}
+        try {
+            context.unregisterReceiver(receiver)
+        } catch (e: Exception) {
+            Log.d(TAG, "Receiver was already unregistered", e)
+        }
     }
 
     fun cleanup() {
