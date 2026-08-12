@@ -1,5 +1,6 @@
 package com.abhishek.zerodroid.features.usbcamera.ui
 
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
@@ -13,6 +14,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+
+// CameraX flags LENS_FACING_EXTERNAL as experimental; USB UVC cameras only ever expose
+// as an external lens, so there's no non-experimental way to select one.
+@SuppressLint("UnsafeOptInUsageError")
+private fun externalCameraSelector(): CameraSelector =
+    CameraSelector.Builder()
+        .requireLensFacing(CameraSelector.LENS_FACING_EXTERNAL)
+        .build()
 
 @Composable
 fun UsbCameraPreview(
@@ -40,9 +49,7 @@ fun UsbCameraPreview(
                 }
 
                 // Try to select external camera
-                val cameraSelector = CameraSelector.Builder()
-                    .requireLensFacing(CameraSelector.LENS_FACING_EXTERNAL)
-                    .build()
+                val cameraSelector = externalCameraSelector()
 
                 try {
                     cameraProvider.unbindAll()

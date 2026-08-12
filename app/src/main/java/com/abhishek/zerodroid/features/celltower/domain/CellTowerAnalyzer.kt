@@ -96,14 +96,23 @@ class CellTowerAnalyzer(
         lastCellType = cell.type
 
         // Keep only last 50 alerts
-        while (alerts.size > 50) alerts.removeLast()
+        while (alerts.size > 50) alerts.removeAt(alerts.lastIndex)
     }
 
+    @Suppress("DEPRECATION")
     private fun CellInfo.toCellTowerInfo(): CellTowerInfo? = when (this) {
         is CellInfoLte -> CellTowerInfo(
             type = CellType.LTE,
-            mcc = cellIdentity.mccString?.toIntOrNull(),
-            mnc = cellIdentity.mncString?.toIntOrNull(),
+            mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                cellIdentity.mccString?.toIntOrNull()
+            } else {
+                cellIdentity.mcc.takeIf { it != CellInfo.UNAVAILABLE }
+            },
+            mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                cellIdentity.mncString?.toIntOrNull()
+            } else {
+                cellIdentity.mnc.takeIf { it != CellInfo.UNAVAILABLE }
+            },
             lac = cellIdentity.tac,
             cid = cellIdentity.ci.toLong(),
             rssi = cellSignalStrength.rsrp,
@@ -112,8 +121,16 @@ class CellTowerAnalyzer(
         )
         is CellInfoGsm -> CellTowerInfo(
             type = CellType.GSM,
-            mcc = cellIdentity.mccString?.toIntOrNull(),
-            mnc = cellIdentity.mncString?.toIntOrNull(),
+            mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                cellIdentity.mccString?.toIntOrNull()
+            } else {
+                cellIdentity.mcc.takeIf { it != CellInfo.UNAVAILABLE }
+            },
+            mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                cellIdentity.mncString?.toIntOrNull()
+            } else {
+                cellIdentity.mnc.takeIf { it != CellInfo.UNAVAILABLE }
+            },
             lac = cellIdentity.lac,
             cid = cellIdentity.cid.toLong(),
             rssi = cellSignalStrength.dbm,
@@ -122,8 +139,16 @@ class CellTowerAnalyzer(
         )
         is CellInfoWcdma -> CellTowerInfo(
             type = CellType.WCDMA,
-            mcc = cellIdentity.mccString?.toIntOrNull(),
-            mnc = cellIdentity.mncString?.toIntOrNull(),
+            mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                cellIdentity.mccString?.toIntOrNull()
+            } else {
+                cellIdentity.mcc.takeIf { it != CellInfo.UNAVAILABLE }
+            },
+            mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                cellIdentity.mncString?.toIntOrNull()
+            } else {
+                cellIdentity.mnc.takeIf { it != CellInfo.UNAVAILABLE }
+            },
             lac = cellIdentity.lac,
             cid = cellIdentity.cid.toLong(),
             rssi = cellSignalStrength.dbm,

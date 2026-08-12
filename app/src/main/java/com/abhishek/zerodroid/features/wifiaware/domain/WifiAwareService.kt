@@ -14,10 +14,13 @@ import android.net.wifi.aware.SubscribeDiscoverySession
 import android.net.wifi.aware.WifiAwareManager
 import android.net.wifi.aware.WifiAwareSession
 import android.os.Build
+import android.util.Log
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+
+private const val TAG = "WifiAwareService"
 
 class WifiAwareService(
     private val context: Context,
@@ -75,21 +78,25 @@ class WifiAwareService(
             .setServiceName(serviceName)
             .build()
 
-        session?.publish(config, object : DiscoverySessionCallback() {
-            override fun onPublishStarted(session: PublishDiscoverySession) {
-                publishSession = session
-            }
+        try {
+            session?.publish(config, object : DiscoverySessionCallback() {
+                override fun onPublishStarted(session: PublishDiscoverySession) {
+                    publishSession = session
+                }
 
-            override fun onMessageReceived(peerHandle: PeerHandle, message: ByteArray) {
-                onPeerDiscovered(
-                    WifiAwarePeer(
-                        serviceId = peerHandle.hashCode().toString(),
-                        serviceName = serviceName,
-                        matchFilter = String(message)
+                override fun onMessageReceived(peerHandle: PeerHandle, message: ByteArray) {
+                    onPeerDiscovered(
+                        WifiAwarePeer(
+                            serviceId = peerHandle.hashCode().toString(),
+                            serviceName = serviceName,
+                            matchFilter = String(message)
+                        )
                     )
-                )
-            }
-        }, null)
+                }
+            }, null)
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Missing permission for Wi-Fi Aware publish", e)
+        }
     }
 
     fun subscribe(serviceName: String, onPeerDiscovered: (WifiAwarePeer) -> Unit) {
@@ -97,25 +104,29 @@ class WifiAwareService(
             .setServiceName(serviceName)
             .build()
 
-        session?.subscribe(config, object : DiscoverySessionCallback() {
-            override fun onSubscribeStarted(session: SubscribeDiscoverySession) {
-                subscribeSession = session
-            }
+        try {
+            session?.subscribe(config, object : DiscoverySessionCallback() {
+                override fun onSubscribeStarted(session: SubscribeDiscoverySession) {
+                    subscribeSession = session
+                }
 
-            override fun onServiceDiscovered(
-                peerHandle: PeerHandle,
-                serviceSpecificInfo: ByteArray,
-                matchFilter: List<ByteArray>
-            ) {
-                onPeerDiscovered(
-                    WifiAwarePeer(
-                        serviceId = peerHandle.hashCode().toString(),
-                        serviceName = serviceName,
-                        matchFilter = matchFilter.joinToString(",") { String(it) }
+                override fun onServiceDiscovered(
+                    peerHandle: PeerHandle,
+                    serviceSpecificInfo: ByteArray,
+                    matchFilter: List<ByteArray>
+                ) {
+                    onPeerDiscovered(
+                        WifiAwarePeer(
+                            serviceId = peerHandle.hashCode().toString(),
+                            serviceName = serviceName,
+                            matchFilter = matchFilter.joinToString(",") { String(it) }
+                        )
                     )
-                )
-            }
-        }, null)
+                }
+            }, null)
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Missing permission for Wi-Fi Aware subscribe", e)
+        }
     }
 
     fun stopPublish() {

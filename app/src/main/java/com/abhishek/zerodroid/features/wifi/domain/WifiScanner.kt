@@ -1,5 +1,6 @@
 package com.abhishek.zerodroid.features.wifi.domain
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,8 @@ class WifiScanner(
     private val wifiManager: WifiManager
 ) {
 
+    // Caller (WifiScreen) gates this behind PermissionGate for ACCESS_FINE_LOCATION before scanning.
+    @SuppressLint("MissingPermission")
     @Suppress("DEPRECATION")
     fun scan(): Flow<List<WifiAccessPoint>> = callbackFlow {
         val receiver = object : BroadcastReceiver() {

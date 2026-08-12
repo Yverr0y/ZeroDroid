@@ -165,7 +165,9 @@ class WifiDirectManager(private val context: Context) {
     }
 
     fun cleanup() {
-        channel?.close()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            channel?.close()
+        }
         channel = null
     }
 

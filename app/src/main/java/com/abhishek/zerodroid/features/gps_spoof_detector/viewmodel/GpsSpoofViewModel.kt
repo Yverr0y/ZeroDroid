@@ -164,7 +164,7 @@ class GpsSpoofViewModel @Inject constructor(
             )
 
             resultHistory.add(0, result)
-            if (resultHistory.size > 20) resultHistory.removeLast()
+            if (resultHistory.size > 20) resultHistory.removeAt(resultHistory.lastIndex)
 
             val spoofDetected = result.spoofConfidence > 0.3f
             if (spoofDetected && !wasSpoofDetected) {

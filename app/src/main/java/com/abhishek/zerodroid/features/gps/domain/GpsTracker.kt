@@ -74,7 +74,7 @@ class GpsTracker(private val context: Context) {
             val trimmed = message.trim()
             if (trimmed.isNotEmpty()) {
                 nmeaBuffer.add(0, trimmed)
-                if (nmeaBuffer.size > 50) nmeaBuffer.removeLast()
+                if (nmeaBuffer.size > 50) nmeaBuffer.removeAt(nmeaBuffer.lastIndex)
                 currentState = currentState.copy(nmeaSentences = nmeaBuffer.toList())
             }
         }
