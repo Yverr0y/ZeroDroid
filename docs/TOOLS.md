@@ -7,7 +7,7 @@ For the project overview, screenshots, and setup, see the [main README](../READM
 
 ---
 
-## All 27 Tools — Detailed Guide
+## All 29 Tools — Detailed Guide
 
 ### Wireless Tools
 
@@ -557,7 +557,42 @@ Overall confidence score aggregated from all checks.
 | Rapid Reconnect | >5 reconnections within 2 minutes | CRITICAL |
 | Channel Hopping | Connected AP unexpectedly changes channel | MEDIUM |
 
-**Bonus:** Signal Logger (tool #28 in the drawer) provides continuous timestamped logging of all WiFi and BLE signal changes — device arrivals, departures, and RSSI anomalies.
+---
+
+#### 28. Signal Logger
+
+**What it solves:** A live scan tells you what's around *right now*. Signal Logger tells you what changed — devices that just appeared, disappeared, or spiked in a way worth a second look.
+
+**How to use:**
+1. Navigate to Signal Logger
+2. Grant WiFi + BLE permissions if prompted
+3. Tap **Start** — WiFi and BLE scans run continuously in parallel
+4. Watch the live feed; use the filter chips (All / WiFi / BLE / Anomalies) to narrow it down
+5. Tap **Export** to copy the full log as a pipe-delimited text table to your clipboard, or the trash icon to clear it
+6. Tap **Stop** when done
+
+**What's logged:** timestamp, event type, source (SSID / BLE name), address (BSSID / MAC), RSSI, and a detail string (channel/band/security for WiFi, service-UUID count for BLE). The feed keeps the most recent 500 entries, plus a live stats row (duration, WiFi AP count, BLE count, anomaly count) and an events/min rate bar with new/lost counts.
+
+**Anomaly detection** (flagged and filterable):
+- **Signal spike** — RSSI jumps more than 20 dBm between consecutive scans
+- **Hidden AP, strong signal** — blank SSID with RSSI stronger than -50 dBm (someone nearby broadcasting a hidden network)
+- **New device burst** — more than 5 new WiFi APs or BLE devices in a single scan cycle, flagged as possible spoofing/flooding
+- Newly-appeared devices (after the first scan cycle) are also flagged; devices that drop out are logged but not treated as anomalies
+
+---
+
+#### 29. Alert Center
+
+**What it solves:** Five different detectors (Rogue AP, Deauth Detector, GPS Spoof, Hidden Camera, Tracker Scanner) can each independently spot a threat while you're focused on a different screen. Alert Center is the one place that collects everything they find, persisted, so nothing gets missed just because you weren't looking at that tool at the time.
+
+**How to use:**
+1. Open **Alert Center** from the drawer, or tap "View all →" on the Dashboard's Recent Threats card
+2. Review the feed — each entry shows a color-coded severity tag, source tool, title, detail, and timestamp
+3. Tap **Clear All** to wipe the history once you've addressed everything (only shown when alerts exist)
+
+**Sources & severities:** Rogue AP, Deauth Detector, GPS Spoof, Hidden Camera, and Tracker Scanner each report into the shared feed with a severity of CRITICAL, HIGH, MEDIUM, or LOW — set by that detector's own risk/threat classification. Each source de-duplicates its own findings before recording, so a single ongoing threat doesn't spam the feed on every scan cycle.
+
+**Persistence:** Alerts are stored in Room and survive app restarts. The feed shows up to the 300 most recent alerts, newest first, until you clear them.
 
 ---
 

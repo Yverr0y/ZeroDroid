@@ -6,11 +6,11 @@
 
 <p align="center">
   <strong>The all-in-one Android hardware toolkit.</strong><br/>
-  Turn your phone into a portable RF lab, network analyzer, and security auditor — <b>27 tools in one app</b>.
+  Turn your phone into a portable RF lab, network analyzer, and security auditor — <b>29 tools in one app</b>.
 </p>
 
 <p align="center">
-  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.0.21-0D1117?style=for-the-badge&logo=kotlin&logoColor=00E676&labelColor=0D1117" />
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.2.0-0D1117?style=for-the-badge&logo=kotlin&logoColor=00E676&labelColor=0D1117" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-0D1117?style=for-the-badge&logo=jetpackcompose&logoColor=00E676&labelColor=0D1117" />
   <img alt="Android 8.0+" src="https://img.shields.io/badge/Android%208.0%2B-0D1117?style=for-the-badge&logo=android&logoColor=00E676&labelColor=0D1117" />
   <img alt="Material 3" src="https://img.shields.io/badge/Material%203-0D1117?style=for-the-badge&logo=materialdesign&logoColor=00E676&labelColor=0D1117" />
@@ -18,12 +18,13 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/theabhishekchandra/ZeroDroid/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/theabhishekchandra/ZeroDroid/ci.yml?branch=main&style=flat-square&color=00C853&labelColor=0D1117&logo=githubactions&logoColor=white&label=CI" /></a>
   <a href="https://github.com/theabhishekchandra/ZeroDroid/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117&logo=github" /></a>
   <a href="https://github.com/theabhishekchandra/ZeroDroid/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117&logo=github" /></a>
   <a href="https://github.com/theabhishekchandra/ZeroDroid/issues"><img alt="Issues" src="https://img.shields.io/github/issues/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117" /></a>
   <img alt="Last commit" src="https://img.shields.io/github/last-commit/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117" />
   <img alt="Code size" src="https://img.shields.io/github/languages/code-size/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117" />
-  <img alt="Tools" src="https://img.shields.io/badge/tools-27-00C853?style=flat-square&labelColor=0D1117" />
+  <img alt="Tools" src="https://img.shields.io/badge/tools-29-00C853?style=flat-square&labelColor=0D1117" />
 </p>
 
 <p align="center">
@@ -39,11 +40,11 @@
 
 ## ⚡ At a Glance
 
-ZeroDroid exposes every radio, sensor, and port your phone has — WiFi, Bluetooth, BLE, NFC, IR, UWB, USB, GPS, cellular, magnetometer, barometer, microphone — through **27 specialized tools** wrapped in a terminal-hacker UI.
+ZeroDroid exposes every radio, sensor, and port your phone has — WiFi, Bluetooth, BLE, NFC, IR, UWB, USB, GPS, cellular, magnetometer, barometer, microphone — through **29 specialized tools** wrapped in a terminal-hacker UI.
 
 |  |  |
 |---|---|
-| 🧰 **27 tools** | Across 5 categories: Wireless · RF & Signals · Sensors · Network · Security |
+| 🧰 **29 tools** | Across 5 categories: Wireless · RF & Signals · Sensors · Network · Security |
 | 📡 **Every radio** | WiFi, BLE, Classic BT, NFC, IR, UWB, SDR, cellular, GPS |
 | 🔋 **Zero idle battery** | No auto-start scanning, everything auto-stops, all services lazy-loaded |
 | 🔒 **Privacy-first** | Runs 100% on-device · no account · permissions requested only when needed |
@@ -64,7 +65,7 @@ ZeroDroid exposes every radio, sensor, and port your phone has — WiFi, Bluetoo
   </tr>
   <tr>
     <td align="center"><sub><b>📊 Dashboard</b><br/>Device &amp; hardware grid</sub></td>
-    <td align="center"><sub><b>🧰 Toolkit</b><br/>27 tools by category</sub></td>
+    <td align="center"><sub><b>🧰 Toolkit</b><br/>29 tools by category</sub></td>
     <td align="center"><sub><b>🧭 Navigation</b><br/>Terminal-styled drawer</sub></td>
   </tr>
 </table>
@@ -151,7 +152,8 @@ Every tool solves a specific, real problem. Full step-by-step docs live in the *
 | **Proximity Radar** | Visual radar plotting devices by estimated distance & signal |
 | **Privacy Score** | 16+ checks across WiFi, Bluetooth, device, network & physical security |
 | **Deauth Detector** | Detects deauth floods, jamming, AP disappearance, channel hopping |
-| **Signal Logger** *(bonus)* | Continuous WiFi+BLE timeline with arrival/departure tracking |
+| **Signal Logger** | Continuous WiFi+BLE timeline with arrival/departure tracking |
+| **Alert Center** | Unified, persisted feed of every threat raised by the other Security tools |
 </details>
 
 ---
@@ -187,12 +189,13 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 Planned improvements — ideas and PRs welcome!
 
 - [ ] Signed APK releases + F-Droid distribution
-- [ ] GitHub Actions CI (build + lint on every PR)
-- [ ] Exportable / shareable scan reports (JSON & PDF)
+- [x] GitHub Actions CI (build + lint on every PR)
+- [x] Unified Alert Center — persisted, cross-tool threat feed (shipped instead of the
+      originally-planned per-scan JSON/PDF export; export may still come later)
 - [ ] Optional light theme
 - [ ] Expanded SDR & tracker signature databases
 - [ ] Localization / translations
-- [ ] Unit & instrumentation test coverage
+- [x] Unit test coverage for domain/util logic (109 tests) — instrumentation tests still open
 
 ---
 
@@ -242,18 +245,16 @@ Everything runs on-device. There's no login and no account. Permissions are requ
 <summary><b>App structure & key design decisions</b></summary>
 
 ```
-ZeroDroidApp (Application)
- └── AppContainer (manual DI — all services lazy-initialized)
-      ├── System Services (SensorManager, WifiManager, BluetoothManager, ...)
-      ├── HardwareChecker (16 capability queries)
-      ├── Room Database (4 entities: BLE, NFC, Wardriving, QR)
-      ├── Phase 1: SensorDataCollector, WifiScanner, BleScanner
-      ├── Phase 2: USB, CellTower, IR, NFC, SDR, Ultrasonic, GPS, ...
-      ├── Phase 3: BluetoothClassic, SPP, MIFARE, SDP, WiFi Direct
-      └── Phase 4: HiddenCameraDetector
+ZeroDroidApp (@HiltAndroidApp Application)
+ └── Hilt DI (core/di/*Module.kt — services scoped per module, most unscoped/fresh-per-use)
+      ├── SystemServiceModule (SensorManager, WifiManager, BluetoothManager, ...)
+      ├── HardwareModule (HardwareChecker — 16 capability queries)
+      ├── DatabaseModule (Room, 5 entities: BLE, NFC, Wardriving, QR, Alert)
+      ├── FeatureModule (~25 domain/repository classes across every tool)
+      └── PreferencesModule, NfcTagBus
 
 Navigation: Jetpack Navigation Compose + ModalNavigationDrawer
-Pattern: MVVM (Screen → ViewModel → Domain → Hardware)
+Pattern: MVVM (Screen → @HiltViewModel → Domain → Hardware)
 UI: Jetpack Compose + Material 3 (dark terminal theme)
 Font: JetBrains Mono throughout
 ```
@@ -272,7 +273,7 @@ feature/
 ├── domain/      # Business logic, scanners, analyzers (no Android UI imports)
 ├── data/        # Repositories (if Room persistence needed)
 ├── ui/          # Composable screens and components
-└── viewmodel/   # ViewModel with Factory pattern
+└── viewmodel/   # @HiltViewModel with @Inject constructor
 ```
 </details>
 
@@ -319,6 +320,7 @@ ZeroDroid requests permissions **only when you open a feature that needs them** 
 | `RECORD_AUDIO` | Ultrasonic Analyzer, RF Bug Sweeper, Privacy Score | Microphone for ultrasonic detection |
 | `FOREGROUND_SERVICE` | Wardriving | Background scanning service |
 | `POST_NOTIFICATIONS` | Wardriving (API 33+) | Foreground service notification |
+| `UWB_RANGING` | UWB Radar | Ultra-wideband distance ranging (API 31+) |
 </details>
 
 ---
@@ -362,26 +364,27 @@ Not all phones have all hardware. The Dashboard shows which capabilities your de
   <img alt="Android Studio" src="https://img.shields.io/badge/Android%20Studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white" />
 </p>
 
-<p align="center"><sub><b>Architecture:</b> MVVM (ViewModel + StateFlow + Compose) · Manual DI (lazy) · Room (auto-migration) · Dark Material 3 theme with JetBrains Mono</sub></p>
+<p align="center"><sub><b>Architecture:</b> MVVM (ViewModel + StateFlow + Compose) · Hilt DI · Room (auto-migration) · Dark Material 3 theme with JetBrains Mono</sub></p>
 
 <details>
 <summary><b>Full dependency versions</b></summary>
 
 | Layer | Technology |
 |-------|-----------|
-| Language | Kotlin 2.0.21 |
-| UI Framework | Jetpack Compose (BOM 2025.05.01) |
+| Language | Kotlin 2.2.0 |
+| UI Framework | Jetpack Compose (BOM 2026.06.01) |
 | Design System | Material 3 (dark theme, JetBrains Mono, CutCornerShape) |
 | Architecture | MVVM (ViewModel + StateFlow + Compose) |
-| Navigation | Jetpack Navigation Compose 2.9.7 |
-| DI | Manual (AppContainer with lazy init) |
-| Database | Room 2.7.1 (4 entities, auto-migration) |
-| Camera | CameraX 1.4.2 |
+| Navigation | Jetpack Navigation Compose 2.9.8 |
+| DI | Hilt 2.60.1 |
+| Database | Room 2.8.4 (5 entities, auto-migration) |
+| Camera | CameraX 1.6.1 |
 | Barcode | ML Kit Barcode 17.3.0 + ZXing 3.5.3 |
-| Location | Play Services Location 21.3.0 |
+| Location | Play Services Location 21.4.0 |
+| Ranging | Jetpack Core UWB 1.0.0 |
 | Permissions | Accompanist Permissions |
-| Build | Gradle 9.2.1, AGP 9.0.1 |
-| Min / Target SDK | 26 (Android 8.0) / 36 |
+| Build | Gradle 9.7.0, AGP 9.3.1 |
+| Min / Target SDK | 26 (Android 8.0) / 37 |
 </details>
 
 ---
@@ -393,25 +396,27 @@ Not all phones have all hardware. The Dashboard shows which capabilities your de
 
 ```
 app/src/main/java/com/abhishek/zerodroid/
-├── MainActivity.kt                  # Entry point, NFC intent handling
-├── ZeroDroidApp.kt                  # Application class, creates AppContainer
+├── MainActivity.kt                  # Entry point (@AndroidEntryPoint), NFC intent handling
+├── ZeroDroidApp.kt                  # Application class (@HiltAndroidApp)
 ├── core/
+│   ├── alerts/                      # Alert Center: AlertModels, AlertCenterRepository
 │   ├── database/                    # Room DB, DAOs, entities, converters
-│   ├── di/AppContainer.kt          # Manual DI — all services (lazy)
+│   ├── di/                          # Hilt modules — SystemServiceModule, FeatureModule,
+│   │                                  DatabaseModule, HardwareModule, PreferencesModule, NfcTagBus
 │   ├── hardware/HardwareChecker.kt  # 16 hardware capability queries
 │   ├── permission/                  # PermissionGate composable, PermissionUtils
 │   ├── ui/                          # TerminalCard, EmptyState, ScanningIndicator,
 │   │                                  StatusIndicator, EthicalUseDialog, HelpContent
 │   └── util/                        # FrequencyUtils, ByteArrayExt
-├── features/                        # 27 tools — one package each (see below)
-│   ├── dashboard/  sensors/  wifi/  ble/  nfc/  bluetooth_classic/  ir/  uwb/
+├── features/                        # 29 tools — one package each (see below)
+│   ├── dashboard/  alert_center/  sensors/  wifi/  ble/  nfc/  bluetooth_classic/  ir/  uwb/
 │   ├── sdr/  ultrasonic/  usb/  usbcamera/  gps/  celltower/  wardriving/
 │   ├── wifi_direct/  wifiaware/  emf_mapper/  camera/  hidden_camera/
 │   ├── gps_spoof_detector/  bluetooth_tracker/  rogue_ap_detector/
 │   └── network_scanner/  rf_bug_sweeper/  proximity_radar/  privacy_score/
 │       deauth_detector/  signal_logger/
 ├── navigation/
-│   ├── ZeroDroidScreen.kt          # 28 screen definitions, 5 categories
+│   ├── ZeroDroidScreen.kt          # 29 screen definitions, 5 categories
 │   ├── AppNavigation.kt            # NavHost + drawer + help system
 │   └── DrawerContent.kt            # Terminal-styled navigation drawer
 └── ui/theme/
@@ -439,14 +444,19 @@ Declining the agreement exits the app.
 ## 🤝 Contributing
 
 Contributions are welcome — bug reports, new tool ideas, hardware compatibility notes, and pull requests.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide (dev setup, project conventions, adding a
+new tool, testing expectations). Short version:
 
 1. **Fork** the repo and create a feature branch: `git checkout -b feature/my-tool`
 2. Follow the existing feature structure (`domain/` → `data/` → `ui/` → `viewmodel/`) — keep Android UI imports out of `domain/`.
-3. Match the code style: Kotlin, MVVM, StateFlow, Jetpack Compose, JetBrains Mono terminal aesthetic.
+3. Match the code style: Kotlin, MVVM, StateFlow, Jetpack Compose, JetBrains Mono terminal aesthetic, Hilt for DI.
 4. Test on a **physical device** — most features depend on real hardware.
 5. Commit with a clear message and open a **pull request** describing what changed and how you verified it.
 
-When adding a new tool: register its screen in `navigation/ZeroDroidScreen.kt`, wire any new service into `core/di/AppContainer.kt` (lazy-initialized), and document it in [`docs/TOOLS.md`](docs/TOOLS.md).
+When adding a new tool: register its screen in `navigation/ZeroDroidScreen.kt`, wire any new
+service into the relevant `core/di/*Module.kt`, and document it in [`docs/TOOLS.md`](docs/TOOLS.md).
+
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md).
 
 ---
 
@@ -454,7 +464,7 @@ When adding a new tool: register its screen in `navigation/ZeroDroidScreen.kt`, 
 
 - 🐛 **Bugs & feature requests:** [open an issue](https://github.com/theabhishekchandra/ZeroDroid/issues)
 - 💡 **Questions & ideas:** start a [discussion](https://github.com/theabhishekchandra/ZeroDroid/discussions)
-- 🔒 **Security disclosures:** please report privately rather than in a public issue
+- 🔒 **Security disclosures:** please report privately via [SECURITY.md](SECURITY.md) rather than in a public issue
 
 If ZeroDroid is useful to you, consider **starring the repo** ⭐ — it helps others discover the project.
 
