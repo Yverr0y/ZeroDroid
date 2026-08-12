@@ -3,12 +3,18 @@ package com.abhishek.zerodroid.features.dashboard
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.abhishek.zerodroid.core.alerts.AlertCenterRepository
+import com.abhishek.zerodroid.core.alerts.UnifiedAlert
 import com.abhishek.zerodroid.core.di.DashboardPrefs
 import com.abhishek.zerodroid.core.hardware.HardwareChecker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 data class DeviceInfo(
@@ -31,7 +37,8 @@ data class LastUsedFeature(
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val hardwareChecker: HardwareChecker,
-    @DashboardPrefs private val prefs: SharedPreferences
+    @DashboardPrefs private val prefs: SharedPreferences,
+    alertCenterRepository: AlertCenterRepository
 ) : ViewModel() {
 
     val deviceInfo = DeviceInfo()
@@ -41,6 +48,14 @@ class DashboardViewModel @Inject constructor(
 
     private val _lastUsedFeature = MutableStateFlow<LastUsedFeature?>(null)
     val lastUsedFeature: StateFlow<LastUsedFeature?> = _lastUsedFeature.asStateFlow()
+
+    val recentAlerts: StateFlow<List<UnifiedAlert>> = alertCenterRepository.alerts
+        .map { it.take(RECENT_ALERTS_LIMIT) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val totalAlertCount: StateFlow<Int> = alertCenterRepository.alerts
+        .map { it.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     init {
         _hardwareItems.value = listOf(
@@ -78,5 +93,6 @@ class DashboardViewModel @Inject constructor(
     companion object {
         private const val KEY_LAST_ROUTE = "last_used_route"
         private const val KEY_LAST_TITLE = "last_used_title"
+        private const val RECENT_ALERTS_LIMIT = 3
     }
 }

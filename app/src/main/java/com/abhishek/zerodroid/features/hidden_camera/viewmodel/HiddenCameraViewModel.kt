@@ -2,11 +2,15 @@ package com.abhishek.zerodroid.features.hidden_camera.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhishek.zerodroid.core.alerts.AlertCenterRepository
+import com.abhishek.zerodroid.core.alerts.AlertSeverity
+import com.abhishek.zerodroid.core.alerts.AlertSource
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.hidden_camera.domain.CameraDetection
 import com.abhishek.zerodroid.features.hidden_camera.domain.DetectionSource
 import com.abhishek.zerodroid.features.hidden_camera.domain.HiddenCameraDetector
 import com.abhishek.zerodroid.features.hidden_camera.domain.HiddenCameraScanState
+import com.abhishek.zerodroid.features.hidden_camera.domain.ThreatLevel
 import com.abhishek.zerodroid.features.sensors.domain.MetalDetector
 import com.abhishek.zerodroid.features.sensors.domain.SensorDataCollector
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
@@ -25,7 +29,8 @@ class HiddenCameraViewModel @Inject constructor(
     private val detector: HiddenCameraDetector,
     private val wifiScanner: WifiScanner,
     private val bleScanner: BleScanner,
-    private val sensorDataCollector: SensorDataCollector
+    private val sensorDataCollector: SensorDataCollector,
+    private val alertCenterRepository: AlertCenterRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HiddenCameraScanState())
@@ -42,6 +47,9 @@ class HiddenCameraViewModel @Inject constructor(
     private val bleDetections = mutableMapOf<String, CameraDetection>()  // keyed by address
     private var magneticDetection: CameraDetection? = null
     private val networkDetections = mutableMapOf<String, CameraDetection>() // keyed by IP
+
+    // Keys already forwarded to the Alert Center this session.
+    private val reportedDetectionKeys = mutableSetOf<String>()
 
     fun startScan() {
         startWifiScan()
@@ -114,6 +122,7 @@ class HiddenCameraViewModel @Inject constructor(
         magneticDetection = null
         networkDetections.clear()
         metalDetector.reset()
+        reportedDetectionKeys.clear()
         _state.value = HiddenCameraScanState()
     }
 
@@ -196,6 +205,8 @@ class HiddenCameraViewModel @Inject constructor(
         // Sort by threat level (HIGH first), then timestamp (newest first)
         allDetections.sortWith(compareBy<CameraDetection> { it.threatLevel.ordinal }.thenByDescending { it.timestamp })
 
+        reportNewDetections(allDetections)
+
         _state.value = _state.value.copy(
             detections = allDetections,
             wifiSuspects = wifiDetections.size,
@@ -204,6 +215,37 @@ class HiddenCameraViewModel @Inject constructor(
             networkSuspects = networkDetections.size
         )
     }
+
+    private fun reportNewDetections(detections: List<CameraDetection>) {
+        val newDetections = detections.filter { reportedDetectionKeys.add(it.dedupeKey()) }
+        if (newDetections.isEmpty()) return
+        viewModelScope.launch {
+            newDetections.forEach { detection ->
+                alertCenterRepository.record(
+                    source = AlertSource.HIDDEN_CAMERA,
+                    severity = detection.threatLevel.toAlertSeverity(),
+                    title = detection.title,
+                    detail = detection.detail,
+                    timestamp = detection.timestamp
+                )
+            }
+        }
+    }
+
+    private fun ThreatLevel.toAlertSeverity(): AlertSeverity = when (this) {
+        ThreatLevel.HIGH -> AlertSeverity.HIGH
+        ThreatLevel.MEDIUM -> AlertSeverity.MEDIUM
+        ThreatLevel.LOW -> AlertSeverity.LOW
+    }
+
+    /**
+     * Content-based identity for dedup. WIFI/BLE/NETWORK detail strings are
+     * stable across rescans of the same device, but MAGNETIC's detail embeds a
+     * continuously-changing sensor reading - key it by source alone so a single
+     * ongoing anomaly doesn't get re-reported on every sensor sample.
+     */
+    private fun CameraDetection.dedupeKey(): String =
+        if (source == DetectionSource.MAGNETIC) source.name else "$source:$title:$detail"
 
     override fun onCleared() {
         super.onCleared()

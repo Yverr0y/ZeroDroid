@@ -94,7 +94,8 @@ fun DrawerContent(
                 ScreenCategory.SENSORS,
                 ScreenCategory.WIRELESS,
                 ScreenCategory.RF,
-                ScreenCategory.NETWORK
+                ScreenCategory.NETWORK,
+                ScreenCategory.SECURITY
             )
 
             orderedCategories.forEach { category ->

@@ -37,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.abhishek.zerodroid.core.ui.EthicalUseDialog
 import com.abhishek.zerodroid.core.ui.FeatureHelpSheet
 import com.abhishek.zerodroid.core.ui.HelpContent
+import com.abhishek.zerodroid.features.alert_center.ui.AlertCenterScreen
 import com.abhishek.zerodroid.features.dashboard.DashboardScreen
 import com.abhishek.zerodroid.features.ble.ui.BleScreen
 import com.abhishek.zerodroid.features.ble.ui.GattExplorerScreen
@@ -269,6 +270,7 @@ fun AppNavigation() {
                 composable(ZeroDroidScreen.DeauthDetector.route) { DeauthDetectorScreen() }
                 composable(ZeroDroidScreen.EmfMapper.route) { EmfMapperScreen() }
                 composable(ZeroDroidScreen.SignalLogger.route) { SignalLoggerScreen() }
+                composable(ZeroDroidScreen.AlertCenter.route) { AlertCenterScreen() }
 
                 // Sub-screens
                 composable(

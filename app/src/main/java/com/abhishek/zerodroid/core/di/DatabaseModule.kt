@@ -3,6 +3,7 @@ package com.abhishek.zerodroid.core.di
 import android.content.Context
 import androidx.room.Room
 import com.abhishek.zerodroid.core.database.AppDatabase
+import com.abhishek.zerodroid.core.database.dao.AlertDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,4 +21,7 @@ object DatabaseModule {
         Room.databaseBuilder(context, AppDatabase::class.java, "zerodroid.db")
             .addMigrations()
             .build()
+
+    @Provides
+    fun provideAlertDao(database: AppDatabase): AlertDao = database.alertDao()
 }

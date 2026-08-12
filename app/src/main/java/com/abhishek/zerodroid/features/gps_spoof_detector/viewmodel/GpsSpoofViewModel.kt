@@ -2,6 +2,9 @@ package com.abhishek.zerodroid.features.gps_spoof_detector.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhishek.zerodroid.core.alerts.AlertCenterRepository
+import com.abhishek.zerodroid.core.alerts.AlertSeverity
+import com.abhishek.zerodroid.core.alerts.AlertSource
 import com.abhishek.zerodroid.features.celltower.domain.CellTowerAnalyzer
 import com.abhishek.zerodroid.features.celltower.domain.CellTowerState
 import com.abhishek.zerodroid.features.gps.domain.GpsState
@@ -28,8 +31,13 @@ class GpsSpoofViewModel @Inject constructor(
     private val cellTowerAnalyzer: CellTowerAnalyzer,
     private val wifiScanner: WifiScanner,
     private val sensorDataCollector: SensorDataCollector,
-    private val spoofDetector: GpsSpoofDetector
+    private val spoofDetector: GpsSpoofDetector,
+    private val alertCenterRepository: AlertCenterRepository
 ) : ViewModel() {
+
+    // Tracks whether spoofing was flagged on the previous analysis pass, so we
+    // only record an alert on the rising edge instead of every 5s while it persists.
+    private var wasSpoofDetected = false
 
     private val _state = MutableStateFlow(GpsSpoofState())
     val state: StateFlow<GpsSpoofState> = _state.asStateFlow()
@@ -53,6 +61,7 @@ class GpsSpoofViewModel @Inject constructor(
 
         spoofDetector.reset()
         resultHistory.clear()
+        wasSpoofDetected = false
         _state.value = GpsSpoofState(
             isMonitoring = true,
             gpsStatus = "Starting...",
@@ -158,6 +167,10 @@ class GpsSpoofViewModel @Inject constructor(
             if (resultHistory.size > 20) resultHistory.removeLast()
 
             val spoofDetected = result.spoofConfidence > 0.3f
+            if (spoofDetected && !wasSpoofDetected) {
+                reportSpoofDetected(result)
+            }
+            wasSpoofDetected = spoofDetected
 
             _state.value = _state.value.copy(
                 spoofDetected = spoofDetected,
@@ -168,6 +181,27 @@ class GpsSpoofViewModel @Inject constructor(
         } catch (e: Exception) {
             _state.value = _state.value.copy(
                 error = "Analysis error: ${e.message}"
+            )
+        }
+    }
+
+    private fun reportSpoofDetected(result: SpoofCheckResult) {
+        val failedChecks = result.checks.filter { !it.passed }
+        val severity = when {
+            result.spoofConfidence >= 0.6f -> AlertSeverity.CRITICAL
+            result.spoofConfidence >= 0.4f -> AlertSeverity.HIGH
+            else -> AlertSeverity.MEDIUM
+        }
+        viewModelScope.launch {
+            alertCenterRepository.record(
+                source = AlertSource.GPS_SPOOF,
+                severity = severity,
+                title = "Possible GPS Spoofing (%.0f%% confidence)".format(result.spoofConfidence * 100),
+                detail = if (failedChecks.isNotEmpty()) {
+                    "Failed checks: ${failedChecks.joinToString("; ") { "${it.name} (${it.detail})" }}"
+                } else {
+                    "Spoof confidence crossed the alert threshold"
+                }
             )
         }
     }

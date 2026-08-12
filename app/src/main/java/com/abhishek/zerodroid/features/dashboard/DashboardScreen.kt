@@ -1,5 +1,6 @@
 package com.abhishek.zerodroid.features.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.ui.TerminalCard
+import com.abhishek.zerodroid.features.alert_center.ui.AlertCard
 import com.abhishek.zerodroid.navigation.ScreenCategory
 import com.abhishek.zerodroid.navigation.ZeroDroidScreen
 import com.abhishek.zerodroid.ui.theme.TerminalGreen
@@ -40,6 +43,8 @@ fun DashboardScreen(
 ) {
     val hardwareItems by viewModel.hardwareItems.collectAsState()
     val lastUsed by viewModel.lastUsedFeature.collectAsState()
+    val recentAlerts by viewModel.recentAlerts.collectAsState()
+    val totalAlertCount by viewModel.totalAlertCount.collectAsState()
     val deviceInfo = viewModel.deviceInfo
 
     LazyColumn(
@@ -128,6 +133,46 @@ fun DashboardScreen(
                     )
                 }
             }
+        }
+
+        // Recent threats — unified feed from every detector tool
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SectionHeader(title = "> RECENT THREATS")
+                if (totalAlertCount > 0) {
+                    Text(
+                        text = "View all ($totalAlertCount) →",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TerminalGreen,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .clickable { onNavigate(ZeroDroidScreen.AlertCenter.route) }
+                    )
+                }
+            }
+        }
+        if (recentAlerts.isEmpty()) {
+            item {
+                TerminalCard(onClick = { onNavigate(ZeroDroidScreen.AlertCenter.route) }) {
+                    Text(
+                        text = "No threats detected yet",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextDim
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Alerts from Rogue AP, Deauth, GPS Spoof, Hidden Camera, and Tracker Scanner appear here",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextDim
+                    )
+                }
+            }
+        } else {
+            items(recentAlerts, key = { it.id }) { alert -> AlertCard(alert = alert) }
         }
 
         // Toolkit - feature grid grouped by category

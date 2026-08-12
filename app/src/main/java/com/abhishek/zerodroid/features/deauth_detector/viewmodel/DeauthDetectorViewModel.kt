@@ -3,7 +3,12 @@ package com.abhishek.zerodroid.features.deauth_detector.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhishek.zerodroid.core.alerts.AlertCenterRepository
+import com.abhishek.zerodroid.core.alerts.AlertSeverity
+import com.abhishek.zerodroid.core.alerts.AlertSource
+import com.abhishek.zerodroid.features.deauth_detector.domain.AlertLevel
 import com.abhishek.zerodroid.features.deauth_detector.domain.DeauthAnalyzer
+import com.abhishek.zerodroid.features.deauth_detector.domain.DeauthEvent
 import com.abhishek.zerodroid.features.deauth_detector.domain.DeauthState
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DeauthDetectorViewModel @Inject constructor(
     private val wifiScanner: WifiScanner,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val alertCenterRepository: AlertCenterRepository
 ) : ViewModel() {
 
     private val analyzer = DeauthAnalyzer(context)
@@ -93,6 +99,8 @@ class DeauthDetectorViewModel @Inject constructor(
                     val uniqueNewEvents = newEvents.filter { it.id !in existingIds }
                     val allEvents = (uniqueNewEvents + current.events)
 
+                    reportNewEvents(uniqueNewEvents)
+
                     val isUnderAttack = allEvents.any {
                         val age = System.currentTimeMillis() - it.timestamp
                         age < 30_000 // Attack active if any event within last 30 seconds
@@ -137,6 +145,28 @@ class DeauthDetectorViewModel @Inject constructor(
      * Get disconnect timestamps for the timeline visualization.
      */
     fun getDisconnectTimestamps(): List<Long> = analyzer.getDisconnectTimestamps()
+
+    private fun reportNewEvents(events: List<DeauthEvent>) {
+        if (events.isEmpty()) return
+        viewModelScope.launch {
+            events.forEach { event ->
+                alertCenterRepository.record(
+                    source = AlertSource.DEAUTH,
+                    severity = event.level.toAlertSeverity(),
+                    title = event.title,
+                    detail = event.detail,
+                    timestamp = event.timestamp
+                )
+            }
+        }
+    }
+
+    private fun AlertLevel.toAlertSeverity(): AlertSeverity = when (this) {
+        AlertLevel.CRITICAL -> AlertSeverity.CRITICAL
+        AlertLevel.HIGH -> AlertSeverity.HIGH
+        AlertLevel.MEDIUM -> AlertSeverity.MEDIUM
+        AlertLevel.LOW -> AlertSeverity.LOW
+    }
 
     override fun onCleared() {
         super.onCleared()

@@ -2,6 +2,9 @@ package com.abhishek.zerodroid.features.bluetooth_tracker.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhishek.zerodroid.core.alerts.AlertCenterRepository
+import com.abhishek.zerodroid.core.alerts.AlertSeverity
+import com.abhishek.zerodroid.core.alerts.AlertSource
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
 import com.abhishek.zerodroid.features.bluetooth_tracker.domain.DetectedTracker
 import com.abhishek.zerodroid.features.bluetooth_tracker.domain.TrackerIdentifier
@@ -21,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BluetoothTrackerViewModel @Inject constructor(
-    private val bleScanner: BleScanner
+    private val bleScanner: BleScanner,
+    private val alertCenterRepository: AlertCenterRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TrackerScanState())
@@ -33,6 +37,10 @@ class BluetoothTrackerViewModel @Inject constructor(
     private var timerJob: Job? = null
     private var scanStartTime: Long = 0L
     private var totalDevicesScanned = 0
+
+    // Highest risk tier already reported per address, so we only alert again
+    // when a tracker's risk climbs to a new tier, not on every BLE advertisement.
+    private val reportedRiskTiers = mutableMapOf<String, TrackingRisk>()
 
     fun startScan() {
         if (_state.value.isScanning) return
@@ -111,6 +119,8 @@ class BluetoothTrackerViewModel @Inject constructor(
                         it.risk == TrackingRisk.HIGH
                     }
 
+                    reportRiskEscalations(sortedTrackers)
+
                     _state.value = _state.value.copy(
                         trackers = sortedTrackers,
                         totalDevicesScanned = totalDevicesScanned,
@@ -134,7 +144,47 @@ class BluetoothTrackerViewModel @Inject constructor(
         trackerMap.clear()
         totalDevicesScanned = 0
         scanStartTime = 0L
+        reportedRiskTiers.clear()
         _state.value = TrackerScanState()
+    }
+
+    private fun reportRiskEscalations(trackers: List<DetectedTracker>) {
+        val escalated = trackers.filter { tracker ->
+            val rank = tracker.risk.severityRank()
+            if (rank < MIN_ALERT_RANK) return@filter false
+            val previousRank = reportedRiskTiers[tracker.address]?.severityRank() ?: -1
+            if (rank > previousRank) {
+                reportedRiskTiers[tracker.address] = tracker.risk
+                true
+            } else {
+                false
+            }
+        }
+        if (escalated.isEmpty()) return
+
+        viewModelScope.launch {
+            escalated.forEach { tracker ->
+                alertCenterRepository.record(
+                    source = AlertSource.BLUETOOTH_TRACKER,
+                    severity = if (tracker.risk == TrackingRisk.HIGH) AlertSeverity.HIGH else AlertSeverity.MEDIUM,
+                    title = "Possible unwanted tracker: ${tracker.displayName}",
+                    detail = "${tracker.type.label} seen ${tracker.seenCount}x, address ${tracker.address}, " +
+                        "signal ${tracker.signalPercent}%",
+                    timestamp = tracker.lastSeen
+                )
+            }
+        }
+    }
+
+    private fun TrackingRisk.severityRank(): Int = when (this) {
+        TrackingRisk.HIGH -> 3
+        TrackingRisk.MEDIUM -> 2
+        TrackingRisk.LOW -> 1
+        TrackingRisk.NONE -> 0
+    }
+
+    companion object {
+        private const val MIN_ALERT_RANK = 2 // MEDIUM or HIGH only
     }
 
     override fun onCleared() {

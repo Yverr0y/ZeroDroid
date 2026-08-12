@@ -2,6 +2,11 @@ package com.abhishek.zerodroid.features.rogue_ap_detector.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhishek.zerodroid.core.alerts.AlertCenterRepository
+import com.abhishek.zerodroid.core.alerts.AlertSeverity
+import com.abhishek.zerodroid.core.alerts.AlertSource
+import com.abhishek.zerodroid.features.rogue_ap_detector.domain.RiskLevel
+import com.abhishek.zerodroid.features.rogue_ap_detector.domain.RogueApAlert
 import com.abhishek.zerodroid.features.rogue_ap_detector.domain.RogueApAnalyzer
 import com.abhishek.zerodroid.features.rogue_ap_detector.domain.RogueApState
 import com.abhishek.zerodroid.features.wifi.domain.WifiScanner
@@ -16,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RogueApViewModel @Inject constructor(
-    private val wifiScanner: WifiScanner
+    private val wifiScanner: WifiScanner,
+    private val alertCenterRepository: AlertCenterRepository
 ) : ViewModel() {
 
     private val analyzer = RogueApAnalyzer()
@@ -25,6 +31,10 @@ class RogueApViewModel @Inject constructor(
     val state: StateFlow<RogueApState> = _state.asStateFlow()
 
     private var scanJob: Job? = null
+
+    // Keys of alerts already forwarded to the Alert Center this session, so a
+    // persistent rogue AP doesn't get re-recorded on every WiFi scan cycle.
+    private val reportedAlertKeys = mutableSetOf<String>()
 
     fun startScan() {
         if (scanJob?.isActive == true) return
@@ -44,6 +54,8 @@ class RogueApViewModel @Inject constructor(
 
                     val suspiciousBssids = alerts.map { it.suspiciousAp.bssid }.toSet()
                     val safeCount = accessPoints.count { it.bssid !in suspiciousBssids }
+
+                    reportNewAlerts(alerts)
 
                     _state.value = _state.value.copy(
                         isScanning = true,
@@ -78,11 +90,35 @@ class RogueApViewModel @Inject constructor(
     }
 
     fun clearAlerts() {
+        reportedAlertKeys.clear()
         _state.value = _state.value.copy(
             alerts = emptyList(),
             suspiciousAps = 0,
             safeAps = _state.value.totalAps
         )
+    }
+
+    private fun reportNewAlerts(alerts: List<RogueApAlert>) {
+        val newAlerts = alerts.filter { reportedAlertKeys.add("${it.suspiciousAp.bssid}:${it.threatType}") }
+        if (newAlerts.isEmpty()) return
+        viewModelScope.launch {
+            newAlerts.forEach { alert ->
+                alertCenterRepository.record(
+                    source = AlertSource.ROGUE_AP,
+                    severity = alert.riskLevel.toAlertSeverity(),
+                    title = alert.title,
+                    detail = alert.description,
+                    timestamp = alert.timestamp
+                )
+            }
+        }
+    }
+
+    private fun RiskLevel.toAlertSeverity(): AlertSeverity = when (this) {
+        RiskLevel.CRITICAL -> AlertSeverity.CRITICAL
+        RiskLevel.HIGH -> AlertSeverity.HIGH
+        RiskLevel.MEDIUM, RiskLevel.SAFE -> AlertSeverity.MEDIUM
+        RiskLevel.LOW -> AlertSeverity.LOW
     }
 
     override fun onCleared() {

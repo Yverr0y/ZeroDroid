@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Nfc
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.Router
@@ -80,6 +81,7 @@ sealed class ZeroDroidScreen(
     data object DeauthDetector : ZeroDroidScreen("deauth_detector", "Deauth Detector", Icons.Default.Router, ScreenCategory.SECURITY)
     data object EmfMapper : ZeroDroidScreen("emf_mapper", "EMF Mapper", Icons.Default.Dashboard, ScreenCategory.SENSORS)
     data object SignalLogger : ZeroDroidScreen("signal_logger", "Signal Logger", Icons.Default.Timeline, ScreenCategory.SECURITY)
+    data object AlertCenter : ZeroDroidScreen("alert_center", "Alert Center", Icons.Default.NotificationsActive, ScreenCategory.SECURITY)
 
     companion object {
         val all: List<ZeroDroidScreen> = listOf(
@@ -88,7 +90,7 @@ sealed class ZeroDroidScreen(
             Gps, BluetoothClassic, WifiDirect,
             HiddenCamera, GpsSpoofDetector, BluetoothTracker, RogueAp,
             NetworkScanner, RfBugSweeper, ProximityRadar, PrivacyScore,
-            DeauthDetector, EmfMapper, SignalLogger
+            DeauthDetector, EmfMapper, SignalLogger, AlertCenter
         )
 
         val byCategory: Map<ScreenCategory, List<ZeroDroidScreen>>
