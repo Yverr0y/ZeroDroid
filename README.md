@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.2.0-0D1117?style=for-the-badge&logo=kotlin&logoColor=00E676&labelColor=0D1117" />
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.4.10-0D1117?style=for-the-badge&logo=kotlin&logoColor=00E676&labelColor=0D1117" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-0D1117?style=for-the-badge&logo=jetpackcompose&logoColor=00E676&labelColor=0D1117" />
   <img alt="Android 8.0+" src="https://img.shields.io/badge/Android%208.0%2B-0D1117?style=for-the-badge&logo=android&logoColor=00E676&labelColor=0D1117" />
   <img alt="Material 3" src="https://img.shields.io/badge/Material%203-0D1117?style=for-the-badge&logo=materialdesign&logoColor=00E676&labelColor=0D1117" />
@@ -18,6 +18,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/theabhishekchandra/ZeroDroid/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117&logo=github&logoColor=white" /></a>
   <a href="https://github.com/theabhishekchandra/ZeroDroid/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/theabhishekchandra/ZeroDroid/ci.yml?branch=main&style=flat-square&color=00C853&labelColor=0D1117&logo=githubactions&logoColor=white&label=CI" /></a>
   <a href="https://github.com/theabhishekchandra/ZeroDroid/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117&logo=github" /></a>
   <a href="https://github.com/theabhishekchandra/ZeroDroid/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/theabhishekchandra/ZeroDroid?style=flat-square&color=00C853&labelColor=0D1117&logo=github" /></a>
