@@ -28,6 +28,7 @@ import com.abhishek.zerodroid.core.permission.PermissionGate
 import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
 import com.abhishek.zerodroid.core.ui.ScanningIndicator
+import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.ble.viewmodel.BleViewModel
 
 @Composable
@@ -104,6 +105,23 @@ private fun BleContent(viewModel: BleViewModel) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error
                 )
+            }
+        }
+
+        if (!scanState.isBluetoothEnabled) {
+            item {
+                TerminalCard {
+                    Text(
+                        text = "> Bluetooth is off",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Turn on Bluetooth in system settings, then tap Scan again.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
 

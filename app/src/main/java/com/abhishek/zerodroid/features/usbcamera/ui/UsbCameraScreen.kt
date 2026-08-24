@@ -1,6 +1,7 @@
 package com.abhishek.zerodroid.features.usbcamera.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -11,23 +12,39 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.abhishek.zerodroid.core.permission.PermissionGate
+import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.EmptyState
 import com.abhishek.zerodroid.core.ui.StatusIndicator
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.usbcamera.viewmodel.UsbCameraViewModel
+import com.abhishek.zerodroid.ui.theme.TerminalGreen
 
 @Composable
 fun UsbCameraScreen(
     viewModel: UsbCameraViewModel = hiltViewModel()
 ) {
+    PermissionGate(
+        permissions = PermissionUtils.cameraPermissions(),
+        rationale = "Camera permission is needed to preview external USB/UVC cameras."
+    ) {
+        UsbCameraContent(viewModel = viewModel)
+    }
+}
+
+@Composable
+private fun UsbCameraContent(viewModel: UsbCameraViewModel) {
     val state by viewModel.state.collectAsState()
 
     LazyColumn(
@@ -74,7 +91,35 @@ fun UsbCameraScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    when {
+                        state.connectingVidPid == device.vidPid ->
+                            CircularProgressIndicator(modifier = Modifier.height(24.dp))
+                        state.connectedVidPid == device.vidPid -> Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Connected — interface claimed",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TerminalGreen,
+                                modifier = Modifier.weight(1f)
+                            )
+                            OutlinedButton(onClick = { viewModel.disconnect() }) { Text("Disconnect") }
+                        }
+                        else -> Button(
+                            onClick = { viewModel.connect(device) },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                        ) { Text("Connect") }
+                    }
                 }
+            }
+        }
+
+        state.connectionError?.let { error ->
+            item {
+                Text(
+                    text = "! $error",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
 

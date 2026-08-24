@@ -22,7 +22,8 @@ data class SatelliteInfo(
     val cn0DbHz: Float,
     val elevationDeg: Float,
     val azimuthDeg: Float,
-    val usedInFix: Boolean
+    val usedInFix: Boolean,
+    val carrierFrequencyHz: Float? = null
 ) {
     val constellationName: String
         get() = when (constellationType) {
@@ -42,5 +43,26 @@ data class SatelliteInfo(
             cn0DbHz >= 25f -> "Good"
             cn0DbHz >= 15f -> "Weak"
             else -> "Very Weak"
+        }
+
+    val commonName: String?
+        get() = SatelliteNames.lookup(constellationType, svid)
+
+    // A satellite tracked on multiple carrier frequencies (common on dual-frequency chipsets)
+    // reports one GnssStatus entry per band, so the same svid can legitimately appear more than
+    // once — this label is what tells those apart instead of looking like a duplicate row.
+    val frequencyBand: String?
+        get() = carrierFrequencyHz?.let { hz ->
+            val mhz = hz / 1_000_000f
+            when {
+                mhz in 1570f..1580f -> "L1"
+                mhz in 1600f..1611f -> "G1"
+                mhz in 1237f..1255f -> "G2"
+                mhz in 1222f..1233f -> "L2"
+                mhz in 1263f..1274f -> "E6"
+                mhz in 1202f..1212f -> "E5b"
+                mhz in 1171f..1181f -> "L5"
+                else -> "%.0fMHz".format(mhz)
+            }
         }
 }

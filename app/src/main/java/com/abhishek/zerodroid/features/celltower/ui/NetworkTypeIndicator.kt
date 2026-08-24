@@ -13,27 +13,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.abhishek.zerodroid.core.ui.TerminalCard
-import com.abhishek.zerodroid.ui.theme.TerminalAmber
-import com.abhishek.zerodroid.ui.theme.TerminalCyan
-import com.abhishek.zerodroid.ui.theme.TerminalGreen
-import com.abhishek.zerodroid.ui.theme.TerminalRed
+import com.abhishek.zerodroid.features.celltower.domain.CellType
 
 @Composable
 fun NetworkTypeIndicator(
-    networkType: String?,
+    cellType: CellType,
     signalStrength: Int,
     modifier: Modifier = Modifier
 ) {
-    val type = networkType?.uppercase() ?: "UNKNOWN"
-    val (label, color) = when {
-        type.contains("NR") || type.contains("5G") -> "5G" to TerminalCyan
-        type.contains("LTE") -> "LTE" to TerminalGreen
-        type.contains("WCDMA") || type.contains("UMTS") || type.contains("HSPA") -> "3G" to TerminalAmber
-        type.contains("GSM") || type.contains("EDGE") || type.contains("GPRS") -> "2G" to TerminalRed
-        else -> type to MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    val style = cellType.generationStyle()
 
-    TerminalCard(modifier = modifier) {
+    TerminalCard(modifier = modifier, glowColor = style.color, animated = true) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -42,11 +32,11 @@ fun NetworkTypeIndicator(
             Column {
                 Text(text = "> Network Type", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = label, style = MaterialTheme.typography.displaySmall, color = color)
+                Text(text = style.label, style = MaterialTheme.typography.displaySmall, color = style.color)
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(text = "Signal", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "$signalStrength dBm", style = MaterialTheme.typography.headlineSmall, color = color)
+                Text(text = "$signalStrength dBm", style = MaterialTheme.typography.headlineSmall, color = style.color)
             }
         }
     }

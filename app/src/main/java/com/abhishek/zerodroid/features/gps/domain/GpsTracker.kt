@@ -58,7 +58,10 @@ class GpsTracker(private val context: Context) {
                         cn0DbHz = status.getCn0DbHz(i),
                         elevationDeg = status.getElevationDegrees(i),
                         azimuthDeg = status.getAzimuthDegrees(i),
-                        usedInFix = status.usedInFix(i)
+                        usedInFix = status.usedInFix(i),
+                        carrierFrequencyHz = if (status.hasCarrierFrequencyHz(i)) {
+                            status.getCarrierFrequencyHz(i)
+                        } else null
                     )
                 }
                 val usedCount = satellites.count { it.usedInFix }

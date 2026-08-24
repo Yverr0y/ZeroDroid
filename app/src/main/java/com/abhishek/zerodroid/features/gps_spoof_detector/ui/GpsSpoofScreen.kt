@@ -422,26 +422,9 @@ private fun GpsInfoCard(result: SpoofCheckResult, state: GpsSpoofState) {
             if (gps != null) {
                 InfoRow("Latitude", "%.6f".format(gps.first))
                 InfoRow("Longitude", "%.6f".format(gps.second))
-
-                // Extract altitude/speed/satellite info from check details
-                val altCheck = result.checks.find { it.name == "Altitude Consistency" }
-                altCheck?.let {
-                    val altMatch = Regex("GPS: (\\S+)").find(it.detail)
-                    altMatch?.let { m -> InfoRow("Altitude", m.groupValues[1]) }
-                }
-
-                val speedCheck = result.checks.find { it.name == "Accelerometer Correlation" }
-                speedCheck?.let {
-                    val speedMatch = Regex("GPS speed: (\\S+ \\S+)").find(it.detail)
-                        ?: Regex("GPS (\\S+)").find(it.detail)
-                    speedMatch?.let { m -> InfoRow("Speed", m.groupValues[1]) }
-                }
-
-                val satCheck = result.checks.find { it.name == "Satellite Count" }
-                satCheck?.let {
-                    val satMatch = Regex("(\\d+) satellites").find(it.detail)
-                    satMatch?.let { m -> InfoRow("Satellites", m.groupValues[1]) }
-                }
+                result.gpsAltitudeM?.let { InfoRow("Altitude", "%.0fm".format(it)) }
+                result.gpsSpeedMps?.let { InfoRow("Speed", "%.1f m/s".format(it)) }
+                result.gpsSatelliteCount?.let { InfoRow("Satellites", it.toString()) }
             } else {
                 Text(
                     text = "Waiting for GPS fix...",

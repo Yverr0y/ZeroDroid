@@ -23,12 +23,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.ble.domain.BleDevice
+import com.abhishek.zerodroid.features.ble.domain.BleDeviceSource
 import com.abhishek.zerodroid.features.ble.domain.BleDeviceTypeIdentifier
 import com.abhishek.zerodroid.features.ble.domain.BleDistanceEstimator
 import com.abhishek.zerodroid.ui.theme.TerminalAmber
+import com.abhishek.zerodroid.ui.theme.TerminalCyan
 import com.abhishek.zerodroid.ui.theme.TerminalGreen
 import com.abhishek.zerodroid.ui.theme.TerminalRed
 
@@ -59,37 +63,44 @@ fun BleDeviceItem(
                     Text(
                         text = device.displayName,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
+                    DeviceChip(text = deviceType.category, color = deviceType.color)
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = deviceType.category,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = deviceType.color,
-                        modifier = Modifier
-                            .background(
-                                color = deviceType.color.copy(alpha = 0.1f),
-                                shape = MaterialTheme.shapes.extraSmall
-                            )
-                            .padding(horizontal = 6.dp, vertical = 1.dp)
+                        text = device.address,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    DeviceChip(
+                        text = if (device.source == BleDeviceSource.CLASSIC) "Classic" else "BLE",
+                        color = TerminalCyan
                     )
                 }
-                Text(
-                    text = device.address,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
+            Spacer(modifier = Modifier.width(8.dp))
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = "${device.rssi} dBm",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = signalColor
+                    color = signalColor,
+                    maxLines = 1
                 )
                 Text(
                     text = "$proximitySymbol $distanceLabel",
                     style = MaterialTheme.typography.labelSmall,
-                    color = deviceType.color
+                    color = deviceType.color,
+                    maxLines = 1
                 )
             }
             IconButton(onClick = onBookmarkToggle, modifier = Modifier.size(36.dp)) {
@@ -127,8 +138,26 @@ fun BleDeviceItem(
                 text = "Services: ${device.serviceUuids.joinToString(", ")}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
+}
+
+@Composable
+private fun DeviceChip(text: String, color: Color) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier
+            .background(
+                color = color.copy(alpha = 0.1f),
+                shape = MaterialTheme.shapes.extraSmall
+            )
+            .padding(horizontal = 6.dp, vertical = 1.dp)
+    )
 }

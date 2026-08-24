@@ -18,7 +18,10 @@ data class UsbCameraState(
     val usbVideoDevices: List<UsbVideoDevice> = emptyList(),
     val camera2ExternalCameras: List<UsbCameraInfo> = emptyList(),
     val isPreviewActive: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val connectingVidPid: String? = null,
+    val connectedVidPid: String? = null,
+    val connectionError: String? = null
 )
 
 data class UsbVideoDevice(

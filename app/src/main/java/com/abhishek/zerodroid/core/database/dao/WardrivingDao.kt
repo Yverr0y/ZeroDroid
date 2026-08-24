@@ -18,9 +18,6 @@ interface WardrivingDao {
     @Insert
     suspend fun insert(record: WardrivingRecordEntity)
 
-    @Query("SELECT COUNT(DISTINCT bssid) FROM wardriving_records WHERE sessionId = :sessionId")
-    suspend fun getUniqueBssidCount(sessionId: String): Int
-
     @Query("SELECT * FROM wardriving_records WHERE sessionId = :sessionId")
     suspend fun getRecordsBySessionList(sessionId: String): List<WardrivingRecordEntity>
 
