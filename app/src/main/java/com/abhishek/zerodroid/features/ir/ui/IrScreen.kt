@@ -48,34 +48,43 @@ fun IrScreen(viewModel: IrViewModel = hiltViewModel()) {
             }
         }
 
-        item {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = state.activeTab == IrScreenTab.REMOTE, onClick = { viewModel.setActiveTab(IrScreenTab.REMOTE) },
-                    label = { Text("Remote", style = MaterialTheme.typography.labelSmall) },
-                    leadingIcon = { Icon(imageVector = Icons.Default.SettingsRemote, contentDescription = null, modifier = Modifier.size(16.dp)) },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = MaterialTheme.colorScheme.primary, selectedLeadingIconColor = MaterialTheme.colorScheme.primary))
-                FilterChip(selected = state.activeTab == IrScreenTab.CUSTOM, onClick = { viewModel.setActiveTab(IrScreenTab.CUSTOM) },
-                    label = { Text("Custom", style = MaterialTheme.typography.labelSmall) },
-                    leadingIcon = { Icon(imageVector = Icons.Default.Code, contentDescription = null, modifier = Modifier.size(16.dp)) },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = MaterialTheme.colorScheme.primary, selectedLeadingIconColor = MaterialTheme.colorScheme.primary))
-                FilterChip(selected = state.activeTab == IrScreenTab.IMPORT, onClick = { viewModel.setActiveTab(IrScreenTab.IMPORT) },
-                    label = { Text("Import", style = MaterialTheme.typography.labelSmall) },
-                    leadingIcon = { Icon(imageVector = Icons.Default.FileOpen, contentDescription = null, modifier = Modifier.size(16.dp)) },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = MaterialTheme.colorScheme.primary, selectedLeadingIconColor = MaterialTheme.colorScheme.primary))
+        if (state.isIrAvailable) {
+            item {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(selected = state.activeTab == IrScreenTab.REMOTE, onClick = { viewModel.setActiveTab(IrScreenTab.REMOTE) },
+                        label = { Text("Remote", style = MaterialTheme.typography.labelSmall) },
+                        leadingIcon = { Icon(imageVector = Icons.Default.SettingsRemote, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = MaterialTheme.colorScheme.primary, selectedLeadingIconColor = MaterialTheme.colorScheme.primary))
+                    FilterChip(selected = state.activeTab == IrScreenTab.CUSTOM, onClick = { viewModel.setActiveTab(IrScreenTab.CUSTOM) },
+                        label = { Text("Custom", style = MaterialTheme.typography.labelSmall) },
+                        leadingIcon = { Icon(imageVector = Icons.Default.Code, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = MaterialTheme.colorScheme.primary, selectedLeadingIconColor = MaterialTheme.colorScheme.primary))
+                    FilterChip(selected = state.activeTab == IrScreenTab.IMPORT, onClick = { viewModel.setActiveTab(IrScreenTab.IMPORT) },
+                        label = { Text("Import", style = MaterialTheme.typography.labelSmall) },
+                        leadingIcon = { Icon(imageVector = Icons.Default.FileOpen, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = MaterialTheme.colorScheme.primary, selectedLeadingIconColor = MaterialTheme.colorScheme.primary))
+                }
             }
-        }
 
-        when (state.activeTab) {
-            IrScreenTab.REMOTE -> {
-                item { IrRemoteGridPanel(selectedProfile = state.selectedProfile, lastTransmitResult = state.lastTransmitResult,
-                    onProfileSelected = viewModel::selectProfile, onButtonPress = viewModel::transmitRemoteButton) }
-            }
-            IrScreenTab.CUSTOM -> {
-                item { IrTransmitPanel(state = state, onProtocolChange = viewModel::setProtocol, onFrequencyChange = viewModel::setFrequency,
-                    onCodeChange = viewModel::setCode, onTransmit = viewModel::transmit) }
-            }
-            IrScreenTab.IMPORT -> {
-                item { IrImportPanel(signals = state.importedSignals, onImportFile = viewModel::importFlipperFile, onTransmitSignal = viewModel::transmitSignal) }
+            when (state.activeTab) {
+                IrScreenTab.REMOTE -> {
+                    item {
+                        Text(
+                            text = "Sends standard industry IR codes for the selected brand — there's no pairing or scanning, IR is one-way.",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    item { IrRemoteGridPanel(selectedProfile = state.selectedProfile, lastTransmitResult = state.lastTransmitResult,
+                        onProfileSelected = viewModel::selectProfile, onButtonPress = viewModel::transmitRemoteButton) }
+                }
+                IrScreenTab.CUSTOM -> {
+                    item { IrTransmitPanel(state = state, onProtocolChange = viewModel::setProtocol, onFrequencyChange = viewModel::setFrequency,
+                        onCodeChange = viewModel::setCode, onTransmit = viewModel::transmit) }
+                }
+                IrScreenTab.IMPORT -> {
+                    item { IrImportPanel(signals = state.importedSignals, onImportFile = viewModel::importFlipperFile, onTransmitSignal = viewModel::transmitSignal) }
+                }
             }
         }
 

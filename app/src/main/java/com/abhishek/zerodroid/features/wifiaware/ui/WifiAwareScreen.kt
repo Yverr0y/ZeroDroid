@@ -16,6 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.abhishek.zerodroid.core.permission.PermissionGate
+import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.StatusIndicator
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.wifiaware.viewmodel.WifiAwareViewModel
@@ -24,6 +26,16 @@ import com.abhishek.zerodroid.features.wifiaware.viewmodel.WifiAwareViewModel
 fun WifiAwareScreen(
     viewModel: WifiAwareViewModel = hiltViewModel()
 ) {
+    PermissionGate(
+        permissions = PermissionUtils.wifiAwarePermissions(),
+        rationale = "Nearby devices / location permission is needed to discover Wi-Fi Aware peers."
+    ) {
+        WifiAwareContent(viewModel = viewModel)
+    }
+}
+
+@Composable
+private fun WifiAwareContent(viewModel: WifiAwareViewModel) {
     DisposableEffect(Unit) {
         onDispose { viewModel.detachSession() }
     }

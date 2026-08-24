@@ -3,16 +3,64 @@ package com.abhishek.zerodroid.features.ble.data
 import com.abhishek.zerodroid.core.database.dao.BleDeviceDao
 import com.abhishek.zerodroid.core.database.entity.BleDeviceEntity
 import com.abhishek.zerodroid.features.ble.domain.BleDevice
+import com.abhishek.zerodroid.features.ble.domain.BleDeviceSource
 import com.abhishek.zerodroid.features.ble.domain.BleScanner
+import com.abhishek.zerodroid.features.bluetooth_classic.domain.BluetoothClassicScanner
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class BleRepository(
     private val bleScanner: BleScanner,
+    private val classicScanner: BluetoothClassicScanner,
     private val bleDeviceDao: BleDeviceDao
 ) {
 
-    fun scan(): Flow<List<BleDevice>> = bleScanner.scan()
+    // Mirrors what the system Bluetooth screen does: BLE advertisement scanning surfaces live
+    // passive broadcasts, Classic discovery actively requests names via inquiry — devices that
+    // only speak Classic Bluetooth (many speakers/headsets/car kits) never show up in a BLE-only
+    // scan at all, so both run together and merge into one address-keyed result set.
+    //
+    // Scan results are freshly rebuilt from the radio on every callback, so isBookmarked can't be
+    // set once and forgotten — it's re-applied here from the DB on every emission, and combine()
+    // re-runs this immediately when a bookmark toggle changes the DB, not just on the next scan tick.
+    fun scan(): Flow<List<BleDevice>> = rawScan().combine(bleDeviceDao.getBookmarkedDevices()) { devices, bookmarked ->
+        val bookmarkedAddresses = bookmarked.map { it.address }.toSet()
+        devices.map { it.copy(isBookmarked = it.address in bookmarkedAddresses) }
+    }
+
+    private fun rawScan(): Flow<List<BleDevice>> = callbackFlow {
+        val merged = mutableMapOf<String, BleDevice>()
+
+        val bleJob = launch {
+            bleScanner.scan().collect { devices ->
+                devices.forEach { merged[it.address] = it.copy(source = BleDeviceSource.BLE) }
+                trySend(merged.values.sortedByDescending { it.rssi })
+            }
+        }
+
+        val classicJob = launch {
+            classicScanner.discover().collect { devices ->
+                devices.forEach { classicDevice ->
+                    merged[classicDevice.address] = BleDevice(
+                        name = classicDevice.name,
+                        address = classicDevice.address,
+                        rssi = classicDevice.rssi,
+                        source = BleDeviceSource.CLASSIC
+                    )
+                }
+                trySend(merged.values.sortedByDescending { it.rssi })
+            }
+        }
+
+        awaitClose {
+            bleJob.cancel()
+            classicJob.cancel()
+        }
+    }
 
     val isAvailable: Boolean get() = bleScanner.isAvailable
 

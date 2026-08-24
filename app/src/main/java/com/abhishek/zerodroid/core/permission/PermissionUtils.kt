@@ -65,6 +65,19 @@ object PermissionUtils {
         add(Manifest.permission.READ_PHONE_STATE)
     }
 
+    fun uwbPermissions(): List<String> = buildList {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            add(Manifest.permission.UWB_RANGING)
+        }
+    }
+
+    fun wifiAwarePermissions(): List<String> = buildList {
+        add(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            add(Manifest.permission.NEARBY_WIFI_DEVICES)
+        }
+    }
+
     fun hiddenCameraPermissions(): List<String> = buildList {
         add(Manifest.permission.CAMERA)
         add(Manifest.permission.ACCESS_FINE_LOCATION)

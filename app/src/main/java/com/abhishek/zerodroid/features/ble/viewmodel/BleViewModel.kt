@@ -20,7 +20,7 @@ class BleViewModel @Inject constructor(
     private val repository: BleRepository
 ) : ViewModel() {
 
-    private val _scanState = MutableStateFlow(BleScanState())
+    private val _scanState = MutableStateFlow(BleScanState(isBluetoothEnabled = repository.isAvailable))
     val scanState: StateFlow<BleScanState> = _scanState.asStateFlow()
 
     private var scanJob: Job? = null
@@ -37,8 +37,13 @@ class BleViewModel @Inject constructor(
     }
 
     private fun startScan() {
+        if (!repository.isAvailable) {
+            _scanState.value = _scanState.value.copy(isBluetoothEnabled = false)
+            return
+        }
+
         scanJob?.cancel()
-        _scanState.value = BleScanState(isScanning = true)
+        _scanState.value = BleScanState(isScanning = true, isBluetoothEnabled = true)
         scanJob = viewModelScope.launch {
             repository.scan()
                 .catch { e ->
@@ -73,6 +78,13 @@ class BleViewModel @Inject constructor(
     fun toggleBookmark(device: BleDevice) {
         viewModelScope.launch {
             repository.toggleBookmark(device)
+            // The scan flow only pushes updates while a scan is actively being collected, but
+            // bookmarking must also work on a stopped/idle results list — flip it locally too.
+            _scanState.value = _scanState.value.copy(
+                devices = _scanState.value.devices.map {
+                    if (it.address == device.address) it.copy(isBookmarked = !it.isBookmarked) else it
+                }
+            )
         }
     }
 

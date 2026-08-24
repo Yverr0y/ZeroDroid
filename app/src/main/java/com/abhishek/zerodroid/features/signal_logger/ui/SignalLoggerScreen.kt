@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -475,7 +476,8 @@ private fun LogEntryRow(entry: SignalLogEntry) {
             color = TextDim,
             fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
-            fontWeight = fontWeight
+            fontWeight = fontWeight,
+            maxLines = 1
         )
 
         Spacer(modifier = Modifier.width(6.dp))
@@ -486,19 +488,23 @@ private fun LogEntryRow(entry: SignalLogEntry) {
             color = typeColor,
             fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
         )
 
         Spacer(modifier = Modifier.width(6.dp))
 
-        // Source name
+        // Source name -- the one field with unpredictable length (SSID/device name), so it's
+        // the only one allowed to shrink; everything else here is short and fixed-format.
         Text(
             text = "\"$sourceStr\"",
             color = typeColor.copy(alpha = 0.85f),
             fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
             fontWeight = fontWeight,
-            maxLines = 1
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false)
         )
 
         Spacer(modifier = Modifier.width(4.dp))
@@ -519,7 +525,8 @@ private fun LogEntryRow(entry: SignalLogEntry) {
                 color = TextSecondary,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 10.sp,
-                fontWeight = fontWeight
+                fontWeight = fontWeight,
+                maxLines = 1
             )
         }
     }

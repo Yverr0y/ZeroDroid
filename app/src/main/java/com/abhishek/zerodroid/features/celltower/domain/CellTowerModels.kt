@@ -8,7 +8,14 @@ data class CellTowerInfo(
     val cid: Long?,
     val rssi: Int,
     val arfcn: Int?,
-    val isRegistered: Boolean = false
+    val isRegistered: Boolean = false,
+    val pci: Int? = null,
+    val rsrq: Int? = null,
+    val snr: Int? = null,
+    val timingAdvance: Int? = null,
+    val distanceMeters: Int? = null,
+    val bandwidthKhz: Int? = null,
+    val carrierName: String? = null
 ) {
     val signalPercent: Int
         get() = when {

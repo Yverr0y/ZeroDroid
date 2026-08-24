@@ -17,9 +17,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.celltower.domain.CellTowerInfo
-import com.abhishek.zerodroid.ui.theme.TerminalAmber
-import com.abhishek.zerodroid.ui.theme.TerminalGreen
-import com.abhishek.zerodroid.ui.theme.TerminalRed
 
 @Composable
 fun CellTowerInfoCard(
@@ -27,11 +24,8 @@ fun CellTowerInfoCard(
     label: String = "",
     modifier: Modifier = Modifier
 ) {
-    val signalColor = when {
-        cell.signalPercent >= 60 -> TerminalGreen
-        cell.signalPercent >= 30 -> TerminalAmber
-        else -> TerminalRed
-    }
+    val style = cell.type.generationStyle()
+    val signalColor = signalColorFor(cell.signalPercent)
     val bgColor = MaterialTheme.colorScheme.surface
 
     TerminalCard(modifier = modifier) {
@@ -50,20 +44,40 @@ fun CellTowerInfoCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = cell.type.displayName,
+                    text = cell.carrierName?.let { "${cell.type.displayName} · $it" } ?: cell.type.displayName,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = style.color
                 )
                 Text(
                     text = buildString {
                         cell.mcc?.let { append("MCC:$it ") }
                         cell.mnc?.let { append("MNC:$it ") }
                         cell.lac?.let { append("LAC:$it ") }
-                        cell.cid?.let { append("CID:$it") }
+                        cell.cid?.let { append("CID:$it ") }
+                        cell.pci?.let { append("PCI:$it") }
                     }.trim(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                val quality = buildString {
+                    cell.rsrq?.let { append("RSRQ:${it}dB ") }
+                    cell.snr?.let { append("SNR:${it}dB ") }
+                    cell.bandwidthKhz?.let { append("BW:${it / 1000}MHz") }
+                }.trim()
+                if (quality.isNotEmpty()) {
+                    Text(
+                        text = quality,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                cell.distanceMeters?.let { distance ->
+                    Text(
+                        text = "~${distance}m from tower (TA:${cell.timingAdvance})",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
