@@ -153,7 +153,11 @@ class CellTowerAnalyzer(
                 snr = cellSignalStrength.rssnr.takeIf { it != CellInfo.UNAVAILABLE },
                 timingAdvance = cellSignalStrength.timingAdvance.taOrNull(),
                 distanceMeters = cellSignalStrength.timingAdvance.taOrNull()?.let { lteTaToMeters(it) },
-                bandwidthKhz = cellIdentity.bandwidth.takeIf { it != CellInfo.UNAVAILABLE }
+                bandwidthKhz = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    cellIdentity.bandwidth.takeIf { it != CellInfo.UNAVAILABLE }
+                } else {
+                    null
+                }
             )
         }
         is CellInfoGsm -> {
