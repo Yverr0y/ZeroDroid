@@ -27,6 +27,7 @@ import com.abhishek.zerodroid.features.nfc.domain.NfcTagManager
 import com.abhishek.zerodroid.features.sdr.domain.SdrDetector
 import com.abhishek.zerodroid.features.sensors.domain.SensorDataCollector
 import com.abhishek.zerodroid.features.ultrasonic.domain.UltrasonicAnalyzer
+import com.abhishek.zerodroid.core.usb.UsbConnectionManager
 import com.abhishek.zerodroid.features.usb.domain.UsbDeviceManager
 import com.abhishek.zerodroid.features.usbcamera.domain.UsbCameraDetector
 import com.abhishek.zerodroid.features.uwb.domain.UwbService
@@ -71,14 +72,22 @@ object FeatureModule {
 
     @Provides
     @Singleton
-    fun provideBleRepository(bleScanner: BleScanner, database: AppDatabase): BleRepository =
-        BleRepository(bleScanner, database.bleDeviceDao())
+    fun provideBleRepository(
+        bleScanner: BleScanner,
+        classicScanner: BluetoothClassicScanner,
+        database: AppDatabase
+    ): BleRepository = BleRepository(bleScanner, classicScanner, database.bleDeviceDao())
 
     // Phase 2 features
     @Provides
     @Singleton
     fun provideUsbDeviceManager(@ApplicationContext context: Context, usbManager: UsbManager?): UsbDeviceManager =
         UsbDeviceManager(context, usbManager)
+
+    @Provides
+    @Singleton
+    fun provideUsbConnectionManager(@ApplicationContext context: Context, usbManager: UsbManager?): UsbConnectionManager =
+        UsbConnectionManager(context, usbManager)
 
     @Provides
     @Singleton
@@ -126,8 +135,8 @@ object FeatureModule {
 
     @Provides
     @Singleton
-    fun provideWardrivingRepository(collector: WardrivingCollector, database: AppDatabase): WardrivingRepository =
-        WardrivingRepository(collector, database.wardrivingDao())
+    fun provideWardrivingRepository(database: AppDatabase): WardrivingRepository =
+        WardrivingRepository(database.wardrivingDao())
 
     @Provides
     @Singleton

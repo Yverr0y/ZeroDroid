@@ -87,7 +87,7 @@ private fun CellTowerContent(viewModel: CellTowerViewModel) {
         state.currentCell?.let { cell ->
             item {
                 NetworkTypeIndicator(
-                    networkType = cell.type.displayName,
+                    cellType = cell.type,
                     signalStrength = cell.rssi
                 )
             }
@@ -98,14 +98,7 @@ private fun CellTowerContent(viewModel: CellTowerViewModel) {
         }
 
         if (state.neighbors.isNotEmpty()) {
-            item {
-                Text(
-                    text = "> Neighbor Cells (${state.neighbors.size})",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            items(state.neighbors) { cell -> CellTowerInfoCard(cell = cell) }
+            item { CellTowerNeighborList(neighbors = state.neighbors) }
         }
 
         if (state.alerts.isNotEmpty()) {

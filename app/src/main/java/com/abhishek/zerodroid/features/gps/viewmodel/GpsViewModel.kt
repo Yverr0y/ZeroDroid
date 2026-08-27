@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhishek.zerodroid.features.gps.domain.GpsState
 import com.abhishek.zerodroid.features.gps.domain.GpsTracker
+import com.abhishek.zerodroid.features.gps.domain.SatelliteInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +40,7 @@ class GpsViewModel @Inject constructor(
                     )
                 }
                 .collect { state ->
-                    _state.value = state
+                    _state.value = state.copy(satellites = state.satellites.sortedInFixOrder())
                 }
         }
     }
@@ -54,4 +55,7 @@ class GpsViewModel @Inject constructor(
         super.onCleared()
         stopTracking()
     }
+
+    private fun List<SatelliteInfo>.sortedInFixOrder(): List<SatelliteInfo> =
+        sortedWith(compareByDescending<SatelliteInfo> { it.usedInFix }.thenByDescending { it.cn0DbHz })
 }

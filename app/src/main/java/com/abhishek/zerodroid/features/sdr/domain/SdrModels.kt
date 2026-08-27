@@ -12,5 +12,8 @@ data class SdrDeviceInfo(
 
 data class SdrState(
     val devices: List<SdrDeviceInfo> = emptyList(),
-    val hasUsbHost: Boolean = false
+    val hasUsbHost: Boolean = false,
+    val connectingVidPid: String? = null,
+    val connectedVidPid: String? = null,
+    val connectionError: String? = null
 )

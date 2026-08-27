@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.abhishek.zerodroid.core.permission.PermissionGate
+import com.abhishek.zerodroid.core.permission.PermissionUtils
 import com.abhishek.zerodroid.core.ui.StatusIndicator
 import com.abhishek.zerodroid.core.ui.TerminalCard
 import com.abhishek.zerodroid.features.uwb.domain.UwbRole
@@ -33,6 +35,16 @@ import com.abhishek.zerodroid.ui.theme.TerminalRed
 fun UwbScreen(
     viewModel: UwbViewModel = hiltViewModel()
 ) {
+    PermissionGate(
+        permissions = PermissionUtils.uwbPermissions(),
+        rationale = "UWB ranging permission is needed to range with nearby UWB devices."
+    ) {
+        UwbContent(viewModel = viewModel)
+    }
+}
+
+@Composable
+private fun UwbContent(viewModel: UwbViewModel) {
     val state by viewModel.state.collectAsState()
 
     LazyColumn(

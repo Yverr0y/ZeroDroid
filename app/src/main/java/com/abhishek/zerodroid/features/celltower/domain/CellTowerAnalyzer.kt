@@ -24,6 +24,14 @@ class CellTowerAnalyzer(
 
     @SuppressLint("MissingPermission")
     fun monitor(): Flow<CellTowerState> = flow {
+        // This analyzer is a singleton, so a fresh monitoring session must not compare against a
+        // baseline left over from a previous Stop/Start — that would flag an ordinary cell change
+        // after being away as a false LAC-change/signal-spike/downgrade "attack" alert.
+        lastLac = null
+        lastRssi = null
+        lastCellType = null
+        alerts.clear()
+
         while (true) {
             try {
                 val cellInfos = telephonyManager?.allCellInfo ?: emptyList()
@@ -99,66 +107,113 @@ class CellTowerAnalyzer(
         while (alerts.size > 50) alerts.removeAt(alerts.lastIndex)
     }
 
+    // 3GPP reserves the all-ones value of a field's bit width to mean "unavailable" (65535 for
+    // 16-bit LAC/TAC, 268435455 for 28-bit CID/CI) — neighbor cells frequently report these
+    // placeholders rather than a real identity, so they must be filtered like MCC/MNC already are,
+    // or the UI ends up displaying a fake-looking tower ID that was never actually broadcast.
+    private fun Int.orNullIfUnavailable(): Int? =
+        takeIf { it != CellInfo.UNAVAILABLE && it != 65535 && it != 268435455 }
+
+    private fun Long.orNullIfUnavailable(): Long? =
+        takeIf { it != CellInfo.UNAVAILABLE.toLong() && it != 65535L && it != 268435455L }
+
+    private fun Int.taOrNull(): Int? = takeIf { it != CellInfo.UNAVAILABLE && it in 0..1282 }
+
+    // Distance from Timing Advance: TA is a round-trip-time unit specific to each radio generation
+    // (LTE: 16*Ts ≈ 78.12m/step, GSM: one bit period ≈ 553.85m/step) — a real security signal, since
+    // a rogue/portable tower sitting unusually close often shows an implausibly small TA.
+    private fun lteTaToMeters(ta: Int): Int = (ta * 78.12).toInt()
+    private fun gsmTaToMeters(ta: Int): Int = (ta * 553.85).toInt()
+
     @Suppress("DEPRECATION")
     private fun CellInfo.toCellTowerInfo(): CellTowerInfo? = when (this) {
-        is CellInfoLte -> CellTowerInfo(
-            type = CellType.LTE,
-            mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        is CellInfoLte -> {
+            val mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 cellIdentity.mccString?.toIntOrNull()
             } else {
                 cellIdentity.mcc.takeIf { it != CellInfo.UNAVAILABLE }
-            },
-            mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            }
+            val mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 cellIdentity.mncString?.toIntOrNull()
             } else {
                 cellIdentity.mnc.takeIf { it != CellInfo.UNAVAILABLE }
-            },
-            lac = cellIdentity.tac,
-            cid = cellIdentity.ci.toLong(),
-            rssi = cellSignalStrength.rsrp,
-            arfcn = cellIdentity.earfcn,
-            isRegistered = isRegistered
-        )
-        is CellInfoGsm -> CellTowerInfo(
-            type = CellType.GSM,
-            mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            }
+            CellTowerInfo(
+                type = CellType.LTE,
+                mcc = mcc,
+                mnc = mnc,
+                carrierName = CarrierLookup.lookup(mcc, mnc),
+                lac = cellIdentity.tac.orNullIfUnavailable(),
+                cid = cellIdentity.ci.toLong().orNullIfUnavailable(),
+                rssi = cellSignalStrength.rsrp,
+                arfcn = cellIdentity.earfcn,
+                isRegistered = isRegistered,
+                pci = cellIdentity.pci.takeIf { it != CellInfo.UNAVAILABLE },
+                rsrq = cellSignalStrength.rsrq.takeIf { it != CellInfo.UNAVAILABLE },
+                snr = cellSignalStrength.rssnr.takeIf { it != CellInfo.UNAVAILABLE },
+                timingAdvance = cellSignalStrength.timingAdvance.taOrNull(),
+                distanceMeters = cellSignalStrength.timingAdvance.taOrNull()?.let { lteTaToMeters(it) },
+                bandwidthKhz = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    cellIdentity.bandwidth.takeIf { it != CellInfo.UNAVAILABLE }
+                } else {
+                    null
+                }
+            )
+        }
+        is CellInfoGsm -> {
+            val mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 cellIdentity.mccString?.toIntOrNull()
             } else {
                 cellIdentity.mcc.takeIf { it != CellInfo.UNAVAILABLE }
-            },
-            mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            }
+            val mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 cellIdentity.mncString?.toIntOrNull()
             } else {
                 cellIdentity.mnc.takeIf { it != CellInfo.UNAVAILABLE }
-            },
-            lac = cellIdentity.lac,
-            cid = cellIdentity.cid.toLong(),
-            rssi = cellSignalStrength.dbm,
-            arfcn = cellIdentity.arfcn,
-            isRegistered = isRegistered
-        )
-        is CellInfoWcdma -> CellTowerInfo(
-            type = CellType.WCDMA,
-            mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            }
+            CellTowerInfo(
+                type = CellType.GSM,
+                mcc = mcc,
+                mnc = mnc,
+                carrierName = CarrierLookup.lookup(mcc, mnc),
+                lac = cellIdentity.lac.orNullIfUnavailable(),
+                cid = cellIdentity.cid.toLong().orNullIfUnavailable(),
+                rssi = cellSignalStrength.dbm,
+                arfcn = cellIdentity.arfcn,
+                isRegistered = isRegistered,
+                timingAdvance = cellSignalStrength.timingAdvance.taOrNull(),
+                distanceMeters = cellSignalStrength.timingAdvance.taOrNull()?.let { gsmTaToMeters(it) }
+            )
+        }
+        is CellInfoWcdma -> {
+            val mcc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 cellIdentity.mccString?.toIntOrNull()
             } else {
                 cellIdentity.mcc.takeIf { it != CellInfo.UNAVAILABLE }
-            },
-            mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            }
+            val mnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 cellIdentity.mncString?.toIntOrNull()
             } else {
                 cellIdentity.mnc.takeIf { it != CellInfo.UNAVAILABLE }
-            },
-            lac = cellIdentity.lac,
-            cid = cellIdentity.cid.toLong(),
-            rssi = cellSignalStrength.dbm,
-            arfcn = cellIdentity.uarfcn,
-            isRegistered = isRegistered
-        )
+            }
+            CellTowerInfo(
+                type = CellType.WCDMA,
+                mcc = mcc,
+                mnc = mnc,
+                carrierName = CarrierLookup.lookup(mcc, mnc),
+                lac = cellIdentity.lac.orNullIfUnavailable(),
+                cid = cellIdentity.cid.toLong().orNullIfUnavailable(),
+                rssi = cellSignalStrength.dbm,
+                arfcn = cellIdentity.uarfcn,
+                isRegistered = isRegistered,
+                pci = cellIdentity.psc.takeIf { it != CellInfo.UNAVAILABLE }
+            )
+        }
         is CellInfoCdma -> CellTowerInfo(
             type = CellType.CDMA,
             mcc = null,
             mnc = cellIdentity.systemId,
+            carrierName = CarrierLookup.lookup(null, cellIdentity.systemId),
             lac = cellIdentity.networkId,
             cid = cellIdentity.basestationId.toLong(),
             rssi = cellSignalStrength.dbm,
@@ -171,27 +226,38 @@ class CellTowerAnalyzer(
                     is CellInfoNr -> {
                         val id = cellIdentity as android.telephony.CellIdentityNr
                         val ss = cellSignalStrength as android.telephony.CellSignalStrengthNr
+                        val mcc = id.mccString?.toIntOrNull()
+                        val mnc = id.mncString?.toIntOrNull()
                         CellTowerInfo(
                             type = CellType.NR,
-                            mcc = id.mccString?.toIntOrNull(),
-                            mnc = id.mncString?.toIntOrNull(),
+                            mcc = mcc,
+                            mnc = mnc,
+                            carrierName = CarrierLookup.lookup(mcc, mnc),
                             lac = id.tac,
                             cid = id.nci,
                             rssi = ss.ssRsrp,
                             arfcn = id.nrarfcn,
+                            isRegistered = isRegistered,
+                            pci = id.pci.takeIf { it != CellInfo.UNAVAILABLE },
+                            rsrq = ss.ssRsrq.takeIf { it != CellInfo.UNAVAILABLE },
+                            snr = ss.ssSinr.takeIf { it != CellInfo.UNAVAILABLE }
+                        )
+                    }
+                    is CellInfoTdscdma -> {
+                        val mcc = cellIdentity.mccString?.toIntOrNull()
+                        val mnc = cellIdentity.mncString?.toIntOrNull()
+                        CellTowerInfo(
+                            type = CellType.TDSCDMA,
+                            mcc = mcc,
+                            mnc = mnc,
+                            carrierName = CarrierLookup.lookup(mcc, mnc),
+                            lac = cellIdentity.lac.orNullIfUnavailable(),
+                            cid = cellIdentity.cid.toLong().orNullIfUnavailable(),
+                            rssi = cellSignalStrength.dbm,
+                            arfcn = cellIdentity.uarfcn,
                             isRegistered = isRegistered
                         )
                     }
-                    is CellInfoTdscdma -> CellTowerInfo(
-                        type = CellType.TDSCDMA,
-                        mcc = cellIdentity.mccString?.toIntOrNull(),
-                        mnc = cellIdentity.mncString?.toIntOrNull(),
-                        lac = cellIdentity.lac,
-                        cid = cellIdentity.cid.toLong(),
-                        rssi = cellSignalStrength.dbm,
-                        arfcn = cellIdentity.uarfcn,
-                        isRegistered = isRegistered
-                    )
                     else -> null
                 }
             } else null

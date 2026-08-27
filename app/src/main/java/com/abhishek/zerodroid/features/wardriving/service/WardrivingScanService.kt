@@ -5,16 +5,39 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.abhishek.zerodroid.R
+import com.abhishek.zerodroid.features.wardriving.data.WardrivingRepository
+import com.abhishek.zerodroid.features.wardriving.domain.WardrivingCollector
+import com.abhishek.zerodroid.features.wardriving.domain.WardrivingSessionState
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+// Owns the GPS+WiFi collection loop directly so it keeps running independent of whatever screen
+// is currently visible — a foreground service that only shows a notification while the real work
+// happens in a ViewModel's viewModelScope gets killed the moment that ViewModel is cleared (e.g.
+// navigating to any other screen), which defeats the point of "background" logging entirely.
+@AndroidEntryPoint
 class WardrivingScanService : Service() {
+
+    @Inject lateinit var collector: WardrivingCollector
+    @Inject lateinit var repository: WardrivingRepository
+    @Inject lateinit var sessionState: WardrivingSessionState
+
+    private val serviceScope = CoroutineScope(SupervisorJob())
+    private var collectJob: Job? = null
 
     companion object {
         const val CHANNEL_ID = "wardriving_scan"
         const val NOTIFICATION_ID = 1001
+        const val EXTRA_SESSION_ID = "session_id"
     }
 
     override fun onCreate() {
@@ -23,8 +46,16 @@ class WardrivingScanService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = buildNotification()
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(NOTIFICATION_ID, buildNotification())
+
+        val sessionId = intent?.getStringExtra(EXTRA_SESSION_ID)
+        if (sessionId != null && collectJob == null) {
+            collectJob = serviceScope.launch {
+                collector.collect()
+                    .catch { stopSelf() }
+                    .collect { records -> repository.saveRecords(sessionId, records) }
+            }
+        }
         return START_STICKY
     }
 
@@ -32,6 +63,9 @@ class WardrivingScanService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        collectJob?.cancel()
+        serviceScope.cancel()
+        sessionState.stop()
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 

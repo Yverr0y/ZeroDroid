@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -5,6 +7,18 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.hilt)
 }
+
+// Release signing comes from keystore.properties (local, gitignored) or environment
+// variables (CI secrets) -- never from a debug keystore, so every release build carries
+// the same stable signing identity and updates don't hit Android's signature-mismatch
+// install failure. See RELEASING.md for how to generate and configure this.
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("keystore.properties")
+    if (file.exists()) load(file.inputStream())
+}
+fun releaseSigningProp(key: String): String? =
+    keystoreProperties.getProperty(key) ?: System.getenv(key)
+val releaseStoreFile = releaseSigningProp("RELEASE_STORE_FILE")
 
 android {
     namespace = "com.abhishek.zerodroid"
@@ -18,10 +32,21 @@ android {
         applicationId = "com.abhishek.zerodroid"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (releaseStoreFile != null) {
+            create("release") {
+                storeFile = file(releaseStoreFile)
+                storePassword = releaseSigningProp("RELEASE_STORE_PASSWORD")
+                keyAlias = releaseSigningProp("RELEASE_KEY_ALIAS")
+                keyPassword = releaseSigningProp("RELEASE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -31,6 +56,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (releaseStoreFile != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {

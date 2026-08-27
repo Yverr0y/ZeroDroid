@@ -66,7 +66,25 @@ fun SdrScreen(
             }
         }
 
-        items(state.devices) { device -> SdrDeviceCard(device = device) }
+        items(state.devices) { device ->
+            SdrDeviceCard(
+                device = device,
+                isConnecting = state.connectingVidPid == device.vidPid,
+                isConnected = state.connectedVidPid == device.vidPid,
+                onConnect = { viewModel.connect(device) },
+                onDisconnect = { viewModel.disconnect() }
+            )
+        }
+
+        state.connectionError?.let { error ->
+            item {
+                Text(
+                    text = "! $error",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
 
         item { SdrInfoPanel() }
         item { Spacer(modifier = Modifier.height(16.dp)) }

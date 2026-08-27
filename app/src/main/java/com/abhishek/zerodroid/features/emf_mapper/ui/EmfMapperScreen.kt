@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -248,6 +247,7 @@ private fun EmfGauge(reading: EmfReading?) {
                 )
 
                 // Needle
+                val isOverflow = magnitude > 200f
                 val clampedMag = magnitude.coerceIn(0f, 200f)
                 val needleAngleDeg = 180f + (clampedMag / 200f) * 180f
                 val needleAngleRad = Math.toRadians(needleAngleDeg.toDouble())
@@ -284,6 +284,22 @@ private fun EmfGauge(reading: EmfReading?) {
                     radius = 3.dp.toPx(),
                     center = Offset(centerX, centerY)
                 )
+
+                // Overflow marker: the needle pins at the 200uT stop for anything above it, so
+                // without this a 250uT reading and a 5000uT reading look identical on the dial --
+                // draw an outward arrowhead past the red zone's end whenever that's happening.
+                if (isOverflow) {
+                    val tipRadius = arcSize.width / 2 + strokeWidth / 2 + 4.dp.toPx()
+                    val tipX = centerX + tipRadius
+                    val arrowSize = 8.dp.toPx()
+                    val arrowPath = Path().apply {
+                        moveTo(tipX, centerY)
+                        lineTo(tipX + arrowSize, centerY - arrowSize / 2)
+                        lineTo(tipX + arrowSize, centerY + arrowSize / 2)
+                        close()
+                    }
+                    drawPath(path = arrowPath, color = TerminalRed)
+                }
 
                 // Scale labels: 0, 50, 100, 150, 200
                 val labelRadius = arcSize.width / 2 + 14.dp.toPx()
@@ -356,6 +372,16 @@ private fun EmfGauge(reading: EmfReading?) {
                     .background(levelColor.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
+
+            if (magnitude > 200f) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "\u25B6 OFF SCALE \u2014 dial maxes at 200\u00B5T",
+                    color = TerminalRed,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 10.sp
+                )
+            }
         }
     }
 }
@@ -394,12 +420,12 @@ private fun RecordingTimer(durationMs: Long) {
 
 @Composable
 private fun RecordControls(state: EmfMapperState, viewModel: EmfMapperViewModel) {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Start/Stop button
+        // Start/Stop button -- kept on its own full-width row since it's the primary action
+        // and its label ("RECORD"/"STOP") must never be squeezed narrow enough to wrap.
         Button(
             onClick = {
                 if (state.isRecording) viewModel.stopRecording() else viewModel.startRecording()
@@ -407,7 +433,7 @@ private fun RecordControls(state: EmfMapperState, viewModel: EmfMapperViewModel)
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (state.isRecording) TerminalRed else TerminalGreen
             ),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
                 imageVector = if (state.isRecording) Icons.Default.Stop else Icons.Default.PlayArrow,
@@ -419,30 +445,58 @@ private fun RecordControls(state: EmfMapperState, viewModel: EmfMapperViewModel)
                 text = if (state.isRecording) "STOP" else "RECORD",
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1
             )
         }
 
-        // Reset baseline
-        OutlinedButton(
-            onClick = { viewModel.resetBaseline() },
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = TerminalAmber)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Refresh,
-                contentDescription = "Reset baseline",
-                tint = TerminalAmber
-            )
-        }
-
-        // Clear history
-        if (state.history.isNotEmpty()) {
-            IconButton(onClick = { viewModel.clearHistory() }) {
+            // Reset baseline
+            OutlinedButton(
+                onClick = { viewModel.resetBaseline() },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = TerminalAmber),
+                modifier = Modifier.weight(1f)
+            ) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Clear history",
-                    tint = TextSecondary
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Reset baseline",
+                    tint = TerminalAmber
                 )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "RESET",
+                    color = TerminalAmber,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 11.sp,
+                    maxLines = 1
+                )
+            }
+
+            // Clear history
+            if (state.history.isNotEmpty()) {
+                OutlinedButton(
+                    onClick = { viewModel.clearHistory() },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Clear history",
+                        tint = TextSecondary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "CLEAR",
+                        color = TextSecondary,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 11.sp,
+                        maxLines = 1
+                    )
+                }
             }
         }
     }

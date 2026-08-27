@@ -78,11 +78,12 @@ private fun WardrivingContent(viewModel: WardrivingViewModel) {
                     if (state.session != null && !state.isScanning) {
                         Button(
                             onClick = {
-                                viewModel.exportCsv { csv ->
+                                viewModel.exportCsv { uri ->
                                     val intent = Intent(Intent.ACTION_SEND).apply {
                                         type = "text/csv"
-                                        putExtra(Intent.EXTRA_TEXT, csv)
+                                        putExtra(Intent.EXTRA_STREAM, uri)
                                         putExtra(Intent.EXTRA_SUBJECT, "wardriving_export.csv")
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                     }
                                     context.startActivity(Intent.createChooser(intent, "Export CSV"))
                                 }

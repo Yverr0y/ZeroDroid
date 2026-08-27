@@ -30,7 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.abhishek.zerodroid.core.permission.PermissionGate
@@ -63,7 +63,6 @@ fun GpsScreen(
 private fun GpsContent(viewModel: GpsViewModel) {
     val state by viewModel.state.collectAsState()
     var satellitesExpanded by remember { mutableStateOf(false) }
-    var nmeaExpanded by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier
@@ -154,24 +153,6 @@ private fun GpsContent(viewModel: GpsViewModel) {
                     items(state.satellites) { sat -> SatelliteRow(sat) }
                 }
             }
-
-            // NMEA section (expandable)
-            if (state.nmeaSentences.isNotEmpty()) {
-                item {
-                    Text(
-                        text = if (nmeaExpanded)
-                            "> NMEA Sentences (${state.nmeaSentences.size.coerceAtMost(20)}) [-]"
-                        else
-                            "> NMEA Sentences (${state.nmeaSentences.size.coerceAtMost(20)}) [+]",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { nmeaExpanded = !nmeaExpanded }
-                    )
-                }
-                if (nmeaExpanded) {
-                    item { NmeaCard(state.nmeaSentences.take(20)) }
-                }
-            }
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -257,16 +238,30 @@ private fun SatelliteRow(sat: SatelliteInfo) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${sat.constellationName} #${sat.svid}",
+                        text = sat.commonName?.let { "${sat.constellationName} #${sat.svid} · $it" }
+                            ?: "${sat.constellationName} #${sat.svid}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = statusColor
+                        color = statusColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (sat.usedInFix) "IN FIX" else "NO FIX",
                         style = MaterialTheme.typography.labelSmall,
-                        color = statusColor
+                        color = statusColor,
+                        maxLines = 1
                     )
+                    sat.frequencyBand?.let { band ->
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = band,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TerminalCyan,
+                            maxLines = 1
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -310,21 +305,6 @@ private fun SatelliteRow(sat: SatelliteInfo) {
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun NmeaCard(sentences: List<String>) {
-    TerminalCard {
-        sentences.forEach { sentence ->
-            Text(
-                text = sentence,
-                style = MaterialTheme.typography.bodySmall,
-                fontFamily = FontFamily.Monospace,
-                color = TerminalCyan,
-                maxLines = 1
-            )
         }
     }
 }

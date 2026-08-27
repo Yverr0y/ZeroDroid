@@ -27,6 +27,9 @@ data class SpoofCheck(
 
 data class SpoofCheckResult(
     val gpsLocation: Pair<Double, Double>?,
+    val gpsAltitudeM: Double?,
+    val gpsSpeedMps: Float?,
+    val gpsSatelliteCount: Int?,
     val cellLocation: Pair<Double, Double>?,
     val wifiLocationEstimate: Pair<Double, Double>?,
     val gpsVsCellDistanceKm: Double?,
@@ -139,8 +142,12 @@ class GpsSpoofDetector(private val context: Context) {
         val currentBssids = wifiAps.map { it.bssid }.toSet()
         if (currentBssids.isNotEmpty()) previousBssids = currentBssids
 
+        val hasGpsFix = gps.latitude != 0.0
         return SpoofCheckResult(
-            gpsLocation = if (gps.latitude != 0.0) Pair(gps.latitude, gps.longitude) else null,
+            gpsLocation = if (hasGpsFix) Pair(gps.latitude, gps.longitude) else null,
+            gpsAltitudeM = if (hasGpsFix) gps.altitude else null,
+            gpsSpeedMps = if (hasGpsFix) gps.speed else null,
+            gpsSatelliteCount = if (hasGpsFix || gps.satelliteCount > 0) gps.satelliteCount else null,
             cellLocation = cellLocation,
             wifiLocationEstimate = wifiLocationEstimate,
             gpsVsCellDistanceKm = gpsVsCellKm,

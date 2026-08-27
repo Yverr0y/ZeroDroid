@@ -1,12 +1,15 @@
 package com.abhishek.zerodroid.features.ble.domain
 
+enum class BleDeviceSource { BLE, CLASSIC }
+
 data class BleDevice(
     val name: String?,
     val address: String,
     val rssi: Int,
     val serviceUuids: List<String> = emptyList(),
     val isBookmarked: Boolean = false,
-    val lastSeen: Long = System.currentTimeMillis()
+    val lastSeen: Long = System.currentTimeMillis(),
+    val source: BleDeviceSource = BleDeviceSource.BLE
 ) {
     val displayName: String get() = name ?: "Unknown Device"
     val signalPercent: Int
@@ -20,5 +23,6 @@ data class BleDevice(
 data class BleScanState(
     val isScanning: Boolean = false,
     val devices: List<BleDevice> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val isBluetoothEnabled: Boolean = true
 )
